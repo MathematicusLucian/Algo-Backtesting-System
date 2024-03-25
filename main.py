@@ -9,8 +9,8 @@ if __name__ == '__main__':
 
     api_key = get_api_key()
     base_currency = "GBP"
-    coins = ["ETH","BTC","XRP","SHIB"]
     coin_data = CoinData(api_key, base_currency)
+    coins = ["ETH","BTC","XRP","SHIB"]
 
     history = coin_data.historic_values(coins)
     print(history)
