@@ -1,0 +1,12 @@
+/* You can add global styles to this file, and also import other style files */
+* {
+  font-family: Lato;
+}
+body {
+  background: #0f0f0f;
+  text-align: center;
+  color: #fff;
+}
+a:link, a:visited, a:hover, a:active, a:-webkit-any-link {
+  color: #fff !important;
+}

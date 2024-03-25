@@ -1,0 +1,60 @@
+<prefab-header></prefab-header>
+
+<div id="main">
+
+  <div *ngIf="retrievedSeasons?.length">
+
+    <mat-form-field>
+      <mat-label>Currency:</mat-label>
+      <select matNativeControl (change)="selectSeason($event)">
+        @for (option of retrievedSeasons; track option) {
+          <option [value]="option.season" [selected]="selectedSeason === option.season">{{ option.season }}</option>
+        }
+      </select>
+    </mat-form-field>
+
+    <div *ngIf="retrievedRoundsForSeason?.length">
+
+      <mat-form-field>
+        <mat-label>Base:</mat-label>
+        <select matNativeControl (change)="selectRound($event)">
+          @for (option of retrievedRoundsForSeason; track option) {
+            <option [value]="option.circuitId" [selected]="selectedRound === option.circuitId">{{ option.circuitId }}: {{ option.circuitName }}</option>
+          }
+        </select>
+      </mat-form-field>
+
+    </div>
+
+  </div>
+
+  <!-- If time, would add a spinner -->
+  <h1 *ngIf="!isSeasonRoundDataSuccess">Loading . . . </h1>
+
+  <div *ngIf="isSeasonRoundDataSuccess">
+      
+    <mat-card-content>
+      <div id="circuits">
+        <h2>{{retrivedSeasonRoundData[0].season}} #{{retrivedSeasonRoundData[0].round}}: <a href="{{retrivedSeasonRoundData[0].url}}">{{retrivedSeasonRoundData[0].raceName}}</a></h2>
+        <p>{{retrivedSeasonRoundData[0].date}} --- {{retrivedSeasonRoundData[0].time}}</p>
+        <p><a href="{{circuitData.circuitUrl}}">{{circuitData.circuitName}} ({{circuitData.circuitId}}), {{circuitData.Location.locality}}, {{circuitData.Location.country}}</a></p>
+        <p>{{circuitData.Location.lat}}, {{circuitData.Location.long}}</p>
+      </div>
+      </mat-card-content>
+
+  </div>
+
+  <prefab-series-chart [chartValue$]="retrievedLapsForRound$ | async"></prefab-series-chart>
+
+  <div *ngIf="raceResults?.length">
+
+    <h2>History</h2>
+    <div id="results">
+      <span *ngFor="let result of retrivedSeasonRoundData[0].Results">
+        </prefab-card [cardData]="result"></prefab-card>
+      </span>
+    </div>
+
+  </div>
+
+</div>
