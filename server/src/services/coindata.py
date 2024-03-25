@@ -1,10 +1,10 @@
+from server.src.services.base import BaseService
 from livecoinwatch import LiveCoinWatch
 
-class CoinData:
+class CoinDataService(BaseService):
 
     def __init__(self, api_key, base_currency):
-        self.api_key = api_key
-        self.base_currency = base_currency
+        super().__init__(api_key, base_currency)
         self.coin_data_api = LiveCoinWatch(api_key, base_currency) 
 
     def set_base_currency(self, currency):

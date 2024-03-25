@@ -1,0 +1,27 @@
+version: '2'
+
+services:
+  crypto_tracker_nginx:
+    container_name: crypto_tracker_nginx_container
+    restart: always
+    image: nginx
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    volumes:
+     - ./ui/dist:/usr/share/nginx/html
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - crypto_tracker_flask
+
+  crypto_tracker_flask:
+    container_name: crypto_tracker_flask_container
+    restart: always
+    image: flask
+    build: ./server
+    volumes:
+     - ./server:/usr/src/app/server
+    env_file:
+     - .env
