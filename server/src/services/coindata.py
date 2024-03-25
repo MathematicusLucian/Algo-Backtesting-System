@@ -1,4 +1,4 @@
-from server.src.services.base import BaseService
+from src.services.base import BaseService
 from livecoinwatch import LiveCoinWatch
 
 class CoinDataService(BaseService):

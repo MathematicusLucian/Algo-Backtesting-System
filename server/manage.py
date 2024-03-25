@@ -1,7 +1,7 @@
 import unittest
 from coverage import coverage
 from flask_script import Manager
-from server.src.api import create_app_blueprint
+from src.api import create_app_blueprint
 
 COV = coverage(
     branch=True,

@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
 from src.api import create_app_blueprint
+from src.utils.common import get_config
 
-application = create_app_blueprint(os.getenv('FLASK_CONFIG') or 'default')
+flask_config = get_config('FLASK_CONFIG')
+config = flask_config if flask_config!=None else 'default'
+print('CFG',config)
+application = create_app_blueprint(config)

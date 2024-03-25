@@ -1,5 +1,5 @@
-from server.src.utils.common import get_config
-from server.src.services.coindata import CoinDataService
+from src.utils.common import get_config
+from src.services.coindata import CoinDataService
 
 if __name__ == '__main__':
 

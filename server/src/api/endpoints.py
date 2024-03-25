@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, jsonify, request
-from utils.common import get_config
-from server.src.services.coindata import CoinDataService
+from src.utils.common import get_config
+from src.services.coindata import CoinDataService
 
 api_key = get_config('LIVECOINWATCH_API_KEY')
 base_currency = get_config('BASE_CURRENCY')

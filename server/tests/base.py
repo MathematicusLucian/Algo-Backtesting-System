@@ -1,6 +1,6 @@
 import unittest
-from server.src.api import create_app_blueprint
-from server.tests import config_name
+from src.api import create_app_blueprint
+from tests import config_name
 
 class BaseTestCase(unittest.TestCase):
 

@@ -1,5 +1,5 @@
 import unittest
-from server.tests.base import BaseTestCase
+from tests.base import BaseTestCase
 
 class TestRoutes(BaseTestCase):
     pass

@@ -10,14 +10,14 @@ This service imports my LiveCoinWatch library, which is an interface to the [Liv
 
 ### Docker
   - Docker Compose to build and host app: ```docker-compose.yml``` to create containers and run the app. Several versions, i.e. for different environments.
-  - Reverse proxy (`nginx`) - web server, and reverse proxy. External user hits the nginx - distributes request to UI or Server.
+  - Reverse proxy (`nginx`) - web server, and reverse proxy. External user hits the nginx - distributes request to UI or 
 
 ### Microservice (Python)
 ***Flask*** app: including tests setup, configs and settings files, Dockerfile for running the Flask container, etc..
   - Flask - Back-End Python framework.
   - ```.env``` variable: Environment variables for Flask and SQLite3. Several versions, i.e. for different environments.
   - Optimised for large scale app structure, with `Blueprints`, `application factory` and several configs that can be extended from this seed project to any Prod-ready app.
-  - uwsgi - WSGI server - direct support for popular NGINX web server.
+  - uwsgi - WSGI server - direct support for popular NGINX web 
   - Flask code Testing.
 
 ### UI (TypeScript)
@@ -31,7 +31,7 @@ This service imports my LiveCoinWatch library, which is an interface to the [Liv
 
 **Running Docker Compose:**
 There are two Docker containers:
-- Flask/Uwsgi - Flask web application with _uwsgi_ server.
+- Flask/Uwsgi - Flask web application with _uwsgi_ 
 - Angular/Nginx - Angular web client
 
 Both built using separate Dockerfiles, created and connected with Docker Compose, and which expand upon the respective official images from Docker Hub.
