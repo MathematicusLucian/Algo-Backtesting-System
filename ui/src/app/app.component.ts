@@ -49,7 +49,7 @@ export class AppComponent implements OnInit {
   }
 
   fetchCoinData = (): void => {
-    const period = "1W";
+    const period = "7";
     const round_results_endpoint = `coin_history?base=${this.selectedBaseCurrency}&second_currency=${this.selectedSecondCurrency}&period=${period}`;
     this.http.get<any>(this.BASE_URL + round_results_endpoint).subscribe(data => {
       this.isChartDataSuccess = true;

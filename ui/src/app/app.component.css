@@ -16,6 +16,7 @@ a:link, a:visited, a:hover, a:active, a:-webkit-any-link {
   color: #fff;
 }
 mat-form-field {
+  margin-top: 10px;
   margin-right: 15px;
 }
 #menu-wrapper {
