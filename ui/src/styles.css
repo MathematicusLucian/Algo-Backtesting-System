@@ -6,6 +6,7 @@ body {
   background: #0f0f0f;
   text-align: center;
   color: #fff;
+  margin: 0 auto !important;
 }
 a:link, a:visited, a:hover, a:active, a:-webkit-any-link {
   color: #fff !important;

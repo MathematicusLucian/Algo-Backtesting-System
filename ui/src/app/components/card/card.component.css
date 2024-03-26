@@ -1,0 +1,12 @@
+.content {
+    padding: 16px;
+}
+mat-card-header {
+    display: block;
+}
+h2, a > span {
+    color: #fff;
+}
+.driver-image {
+    max-width: 250px
+}

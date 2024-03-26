@@ -15,14 +15,12 @@ import { NgxEchartsModule } from 'ngx-echarts';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/header/header.component';
 import { CardComponent } from './components/card/card.component';
-import { SeriesChartComponent } from './components/series-chart/series-chart.component';
 
 @NgModule({
   declarations: [
     AppComponent, 
     HeaderComponent,
-    CardComponent,
-    SeriesChartComponent
+    CardComponent
   ],
   imports: [
     BrowserModule,
