@@ -15,7 +15,7 @@
 
     <span>to</span>
 
-    <!-- <div *ngIf="secondCurrencyMenu?.length"> -->
+    <div id="menu-wrapper" *ngIf="secondCurrencyMenu?.length">
 
       <mat-form-field>
         <!-- <mat-label>Currency:</mat-label> -->
@@ -26,10 +26,7 @@
         </select>
       </mat-form-field>
 
-    <!-- </div> -->
-
-    <pre>{{selectedBaseCurrency|json}}</pre>
-    <pre>{{selectSecondCurrency|json}}</pre>
+    </div>
 
   </div>
 

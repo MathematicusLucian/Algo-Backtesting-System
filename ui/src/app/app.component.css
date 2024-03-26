@@ -15,3 +15,10 @@ a:link, a:visited, a:hover, a:active, a:-webkit-any-link {
   background: #00000c;
   color: #fff;
 }
+mat-form-field {
+  margin-right: 15px;
+}
+#menu-wrapper {
+  display: inline;
+  margin-left: 15px;
+}

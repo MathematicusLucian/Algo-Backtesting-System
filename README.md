@@ -27,7 +27,7 @@ This service imports my LiveCoinWatch library, which is an interface to the [Liv
 **NB. Setup the UI before Docker Compose**: 
 [Angular Prerequisites] (https://github.com/angular/angular-cli#prerequisites) - that being, Docker, node, npm and angular-cli.
 - Navigate to the `ui` directory. 
-- Execute `ng build --prod` to create a production build for Angular.
+- Execute `ng build`; and with `--prod` to create a production build for Angular.
 
 **Running Docker Compose:**
 There are two Docker containers:

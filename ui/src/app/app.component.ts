@@ -31,37 +31,38 @@ export class AppComponent implements OnInit {
     this.setupBaseCurrencyDropdown();
   }
 
-  setupBaseCurrencyDropdown(): void {
+  setupBaseCurrencyDropdown = (): void => {
     const currencies_endpoint = `currencies`;
     this.http.get<any>(this.BASE_URL + currencies_endpoint).subscribe(data => {
       this.baseCurrencyMenu = data["res"];
-      this.selectedBaseCurrency = data["res"][0];
-      console.log("selectedBaseCurrency",this.selectedBaseCurrency);
+      this.selectedBaseCurrency = data["res"][0]["code"];
       this.setupSecondCurrencyDropdown();
     })
   }
 
-  setupSecondCurrencyDropdown(): void {
-    const currencies_endpoint = `currencies?selected=${this.selectedBaseCurrency.code}`;
+  setupSecondCurrencyDropdown = (): void => {
+    const currencies_endpoint = `currencies?selected=${this.selectedBaseCurrency}`;
     this.http.get<any>(this.BASE_URL + currencies_endpoint).subscribe(data => {
       this.secondCurrencyMenu = data["res"];
+      this.selectedSecondCurrency = data["res"][1]["code"];
     })
   }
 
-  fetchCoinData(): void {
-    const round_results_endpoint = `round_results?base=${this.selectedBaseCurrency.code}&second_currency=${this.selectedSecondCurrency.code}`;
+  fetchCoinData = (): void => {
+    const period = "1W";
+    const round_results_endpoint = `coin_history?base=${this.selectedBaseCurrency}&second_currency=${this.selectedSecondCurrency}&period=${period}`;
     this.http.get<any>(this.BASE_URL + round_results_endpoint).subscribe(data => {
       this.isChartDataSuccess = true;
       this.coinHistoryData = data;
     })
   }
 
-  selectBaseCurrency(event: Event): void {
+  selectBaseCurrency = (event: Event): void => {
     this.selectedBaseCurrency = (event.target as HTMLSelectElement).value;
     this.setupSecondCurrencyDropdown();
   }
 
-	selectSecondCurrency(event: Event): void {
+	selectSecondCurrency = (event: Event): void => {
     this.selectedSecondCurrency = (event.target as HTMLSelectElement).value;
     this.fetchCoinData();
 	}
