@@ -108,7 +108,11 @@ def macd_crypto():
     return determine_macd_crypto()
 
 
+# /// CRYPTO DATA ///
 
+# --------------------
+# --- COIN VALUES ----
+# --------------------
 # /api/currencies?selected=GBP
 @algo_rest_blueprint.route("/api/currencies")
 def currencies():
@@ -131,3 +135,37 @@ def historic_values__coins():
 @algo_rest_blueprint.route("/api/latest_values")
 def latest_values():
     return coin_data.get_latest_values(coins)
+
+# --------------------
+# --- CANDLESTICKS ---
+# --------------------
+# http://127.0.0.1:5000/candlesticks__crypto_spot/BTC/USD/
+# http://127.0.0.1:5000/historic_candlesticks__crypto_spot/ETH/USD/
+@algo_rest_blueprint.route('/candlesticks__crypto_spot/<base_curr>/<symbol>/', methods=['GET'])
+async def candlesticks__crypto_spot(base_curr, symbol):
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    instrID = f"{base_curr}-{symbol}"
+    return jsonify(okx_api.get_candlesticks(instrID))
+
+# http://127.0.0.1:5000/historic_candlesticks__crypto_spot/BTC/USD/
+# http://127.0.0.1:5000/historic_candlesticks__crypto_spot/ETH/USD/
+@algo_rest_blueprint.route('/historic_candlesticks__crypto_spot/<base_curr>/<symbol>/', methods=['GET'])
+async def historic_candlesticks__crypto_spot(base_curr, symbol):
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    instrID = f"{base_curr}-{symbol}"
+    return jsonify(okx_api.get_index_candlesticks(instrID))
+
+@algo_rest_blueprint.route('/historic_candlesticks__crypto_mark_price/<base_curr>/<symbol>/', methods=['GET'])
+async def historic_candlesticks__crypto_mark_price(base_curr, symbol):
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    instrID = f"{base_curr}-{symbol}"
+    return jsonify(okx_api.get_mark_price_candlesticks(instrID))
+
+# http://127.0.0.1:5000/historic_candlesticks__crypto_swap/BTC/USD/
+# http://127.0.0.1:5000/historic_candlesticks__crypto_swap/ETH/USD/
+# https://www.okx.com/docs-v5/en/#public-data-rest-api-get-index-candlesticks
+@algo_rest_blueprint.route('/historic_candlesticks__crypto_swap/<base_curr>/<symbol>/', methods=['GET'])
+async def historic_candlesticks__crypto_swap(base_curr, symbol):
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    instrID = f"{base_curr}-{symbol}-SWAP"
+    return jsonify(okx_api.get_history_candlesticks(instrID))
