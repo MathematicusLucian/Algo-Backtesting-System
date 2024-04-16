@@ -67,7 +67,7 @@ def get_root():
 # @cache.cached(timeout=60)
 def index():
     version = "v1.0.0"
-    return jsonify({"CryptoTracker API" : format(escape(version))})
+    return jsonify({"CryptoTracker API -/" : format(escape(version))})
 
 @algo_rest_blueprint.route("/api")
 def helloworld():
@@ -103,10 +103,9 @@ def fetch_audusd15m_():
 # --------------------
 # ------- MACD -------
 # --------------------
-@algo_rest_blueprint.route('/macd_crypto/', methods=['GET'])
+@algo_rest_blueprint.route('/api/macd_crypto/', methods=['GET'])
 def macd_crypto():
     return determine_macd_crypto()
-
 
 # /// CRYPTO DATA ///
 
@@ -141,7 +140,7 @@ def latest_values():
 # --------------------
 # http://127.0.0.1:5000/candlesticks__crypto_spot/BTC/USD/
 # http://127.0.0.1:5000/historic_candlesticks__crypto_spot/ETH/USD/
-@algo_rest_blueprint.route('/candlesticks__crypto_spot/<base_curr>/<symbol>/', methods=['GET'])
+@algo_rest_blueprint.route('/api/candlesticks__crypto_spot/<base_curr>/<symbol>/', methods=['GET'])
 async def candlesticks__crypto_spot(base_curr, symbol):
     okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
     instrID = f"{base_curr}-{symbol}"
@@ -149,13 +148,13 @@ async def candlesticks__crypto_spot(base_curr, symbol):
 
 # http://127.0.0.1:5000/historic_candlesticks__crypto_spot/BTC/USD/
 # http://127.0.0.1:5000/historic_candlesticks__crypto_spot/ETH/USD/
-@algo_rest_blueprint.route('/historic_candlesticks__crypto_spot/<base_curr>/<symbol>/', methods=['GET'])
+@algo_rest_blueprint.route('/api/historic_candlesticks__crypto_spot/<base_curr>/<symbol>/', methods=['GET'])
 async def historic_candlesticks__crypto_spot(base_curr, symbol):
     okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
     instrID = f"{base_curr}-{symbol}"
     return jsonify(okx_api.get_index_candlesticks(instrID))
 
-@algo_rest_blueprint.route('/historic_candlesticks__crypto_mark_price/<base_curr>/<symbol>/', methods=['GET'])
+@algo_rest_blueprint.route('/api/historic_candlesticks__crypto_mark_price/<base_curr>/<symbol>/', methods=['GET'])
 async def historic_candlesticks__crypto_mark_price(base_curr, symbol):
     okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
     instrID = f"{base_curr}-{symbol}"
@@ -164,8 +163,85 @@ async def historic_candlesticks__crypto_mark_price(base_curr, symbol):
 # http://127.0.0.1:5000/historic_candlesticks__crypto_swap/BTC/USD/
 # http://127.0.0.1:5000/historic_candlesticks__crypto_swap/ETH/USD/
 # https://www.okx.com/docs-v5/en/#public-data-rest-api-get-index-candlesticks
-@algo_rest_blueprint.route('/historic_candlesticks__crypto_swap/<base_curr>/<symbol>/', methods=['GET'])
+@algo_rest_blueprint.route('/api/historic_candlesticks__crypto_swap/<base_curr>/<symbol>/', methods=['GET'])
 async def historic_candlesticks__crypto_swap(base_curr, symbol):
     okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
     instrID = f"{base_curr}-{symbol}-SWAP"
     return jsonify(okx_api.get_history_candlesticks(instrID))
+
+# --------------------
+# ---- COMPONENTS ----
+# --------------------
+@algo_rest_blueprint.route('/api/index_components/<base_curr>/<symbol>/', methods=['GET'])
+async def index_components__crypto(base_curr, symbol):
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    instrID = f"{base_curr}-{symbol}"
+    return jsonify(okx_api.get_index_components(instrID))
+
+# --------------------
+# -- EXCHANGE RATE ---
+# --------------------
+@algo_rest_blueprint.route('/api/exchange_rate/', methods=['GET'])
+async def exchange_rate():
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    return jsonify(okx_api.get_exchange_rate())
+
+# --------------------
+# ---- ORDERBOOK -----
+# --------------------
+@algo_rest_blueprint.route('/api/orderbook/<base_curr>/<symbol>/', methods=['GET'])
+async def orderbook(base_curr, symbol):
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    instrID = f"{base_curr}-{symbol}"
+    return jsonify(okx_api.get_orderbook(instrID))
+
+@algo_rest_blueprint.route('/api/orderbook_basic/<base_curr>/<symbol>/', methods=['GET'])
+async def orderbook_basic(base_curr, symbol):
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    instrID = f"{base_curr}-{symbol}"
+    return jsonify(okx_api.get_order_lite_book(instrID))
+
+# --------------------
+# ----- TICKER(S) ----
+# --------------------
+@algo_rest_blueprint.route('/api/index_tickers/<base_curr>/<symbol>/', methods=['GET'])
+async def index_tickers(base_curr, symbol):
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    instrID = f"{base_curr}-{symbol}"
+    return jsonify(okx_api.get_index_tickers(instId=instrID))
+
+# --------------------
+# ------ TRADES ------
+# --------------------
+@algo_rest_blueprint.route('/api/trades/<base_curr>/<symbol>/', methods=['GET'])
+async def trades(base_curr, symbol):
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    instrID = f"{base_curr}-{symbol}"
+    return jsonify(okx_api.get_trades(instrID))
+
+@algo_rest_blueprint.route('/api/history_trades/<base_curr>/<symbol>/', methods=['GET'])
+async def history_trades(base_curr, symbol):
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    instrID = f"{base_curr}-{symbol}"
+    return jsonify(okx_api.get_history_trades(instId=instrID))
+
+# --------------------
+# ------ VOLUME ------
+# --------------------
+@algo_rest_blueprint.route('/api/volume/', methods=['GET'])
+async def volume():
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    return jsonify(okx_api.get_volume())
+
+# strategy = SampleMM()
+# # run = await strategy.run()
+# # url = "wss://ws.okx.com:8443/ws/v5/public"
+# # url = "wss://ws.okx.com:8443/ws/v5/public?brokerId=9999"
+# # market_data_service = WssMarketDataService(url=url, inst_id="BTC-USDT-SWAP", channel="books")
+# # await market_data_service.start()
+# # await market_data_service.run_service()
+# # check_sum = ChecksumThread(market_data_service)
+# # print("check_sum",check_sum)
+# # check_sum.start()
+# # print(market_data_service)
+
