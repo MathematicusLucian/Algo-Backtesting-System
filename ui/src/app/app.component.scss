@@ -1,0 +1,186 @@
+// a:link, a:visited, a:hover, a:active, a:-webkit-any-link {
+//   color: #fff !important;
+// }
+// #results, #results > span {
+//   display: flex;
+// }
+// #results {
+//   display: flex;
+//   flex-wrap: wrap;
+//   gap: 5px;
+// }
+// #results > span {
+//   flex: 1 1 250px;
+//   border: 2px solid #010101;
+//   background: #00000c;
+//   color: #fff;
+// }
+// mat-form-field {
+//   margin-top: 10px;
+//   margin-right: 15px;
+// }
+// #menu-wrapper {
+//   display: inline;
+//   margin-left: 15px;
+// }
+
+p {
+    font-family: Lato;
+    margin: 0;
+    color: var(--gray-700);
+  }
+
+  h1 {
+    font-size: 3.125rem;
+    color: var(--gray-900);
+    font-weight: 500;
+    line-height: 100%;
+    letter-spacing: -0.125rem;
+    margin: 0;
+    font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+      "Segoe UI Symbol";
+  }
+
+  main {
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    box-sizing: inherit;
+    position: relative;
+  }
+
+  .content {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 700px;
+    margin-bottom: 3rem;
+  }
+
+  .content h1 {
+    margin-top: 1.75rem;
+  }
+
+  .content p {
+    margin-top: 1.5rem;
+  }
+
+  .divider {
+    width: 1px;
+    background: var(--red-to-pink-to-purple-vertical-gradient);
+    margin-inline: 0.5rem;
+  }
+
+  .pill-group {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+  }
+
+  .pill {
+    display: flex;
+    align-items: center;
+    --pill-accent: var(--bright-blue);
+    background: color-mix(in srgb, var(--pill-accent) 5%, transparent);
+    color: var(--pill-accent);
+    padding-inline: 0.75rem;
+    padding-block: 0.375rem;
+    border-radius: 2.75rem;
+    border: 0;
+    transition: background 0.3s ease;
+    font-family: var(--inter-font);
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 1.4rem;
+    letter-spacing: -0.00875rem;
+    text-decoration: none;
+  }
+
+  .pill:hover {
+    background: color-mix(in srgb, var(--pill-accent) 15%, transparent);
+  }
+
+  .pill-group .pill:nth-child(6n + 1) {
+    --pill-accent: var(--bright-blue);
+  }
+  .pill-group .pill:nth-child(6n + 2) {
+    --pill-accent: var(--french-violet);
+  }
+  .pill-group .pill:nth-child(6n + 3),
+  .pill-group .pill:nth-child(6n + 4),
+  .pill-group .pill:nth-child(6n + 5) {
+    --pill-accent: var(--hot-red);
+  }
+
+  .pill-group svg {
+    margin-inline-start: 0.25rem;
+  }
+
+  /* Sidebar styles */
+.sidebar {
+  height: 100vh;
+  width: 150px;
+  /* Sidebar width */
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #111;
+  /* Dark background for better contrast */
+  color: white;
+  /* Light text for readability */
+  overflow-x: hidden;
+  padding-top: 20px;
+}
+
+.pair-selector {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  /* Smooth transition for hover effect */
+}
+
+.pair-selector:hover {
+  background-color: #575757;
+}
+
+/* Adjust the main content area */
+.main-content {
+  margin-left: 150px;
+  /* Same as sidebar width */
+  padding: 20px;
+}
+
+.metadata-container {
+  margin-bottom: 0px; /* Eliminate bottom margin */
+  padding-bottom: 0px; /* Eliminate bottom padding */
+}
+
+#chartContainer {
+  margin-top: 0px; /* Eliminate top margin */
+  /* Ensure there's no unnecessary height */
+  height: 600px; /* Adjust this based on your desired chart height */
+}
+
+  @media screen and (max-width: 650px) {
+    .content {
+      flex-direction: column;
+      width: max-content;
+    }
+
+    .divider {
+      height: 1px;
+      width: 100%;
+      background: var(--red-to-pink-to-purple-horizontal-gradient);
+      margin-block: 1.5rem;
+    }
+  }

@@ -38,7 +38,9 @@
 // import 'classlist.js';  // Run `npm install --save classlist.js`.
 
 /** Evergreen browsers require these. **/
-// import 'core-js/es6/reflect';
+// import "core-js/es6/reflect";
+// import "core-js/es7/reflect";
+// import 'core-js/es/symbol';
 
 /**
  * Required to support Web Animations `@angular/animation`.
@@ -64,3 +66,5 @@ import "zone.js"; // Included with Angular CLI.
  * Need to import at least one locale-data with intl.
  */
 // import 'intl/locale-data/jsonp/en';
+// import 'core-js/features/reflect';
+// import 'zone.js/dist/zone';

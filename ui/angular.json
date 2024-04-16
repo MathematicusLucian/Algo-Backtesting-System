@@ -3,44 +3,63 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angular-seed": {
+    "algo-ui": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
-      "projectType": "application",
+      "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:browser-esbuild",
           "options": {
-            "aot": true,
             "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "tsConfig": "src/tsconfig.app.json",
+            "preserveSymlinks": true,
             "polyfills": "src/polyfills.ts",
+            "tsConfig": "tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
             "assets": [
-              "src/assets",
-              "src/favicon.ico"
+              "src/favicon.ico",
+              "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/hammerjs/hammer.min.js"
+            ]
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
+                  "type": "initial",
+                  "maximumWarning": "2500kb",
+                  "maximumError": "3mb"
+                },
+                {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
+                  "maximumWarning": "25kb",
+                  "maximumError": "50kb"
                 }
               ],
               "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
+              "outputHashing": "all"
+            },
+              "optimization": true,
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
               "extractCss": true,
               "namedChunks": false,
               "aot": true,
-              "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
               "fileReplacements": [
@@ -50,23 +69,28 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "buildTarget": "angular-seed:build"
+            "forceEsbuild":true
           },
           "configurations": {
             "production": {
-              "buildTarget": "angular-seed:build:production"
+              "buildTarget": "algo-ui:build:production"
+            },
+            "development": {
+              "buildTarget": "algo-ui:build:development"
             }
-          }
+          },
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "angular-seed:build"
+            "buildTarget": "algo-ui:build"
           }
         },
         "test": {
@@ -75,14 +99,15 @@
             "main": "src/test.ts",
             "karmaConfig": "./karma.conf.js",
             "polyfills": "src/polyfills.ts",
-            "tsConfig": "src/tsconfig.spec.json",
             "scripts": [],
             "styles": [
-              "src/styles.css"
+              "src/styles.scss"
             ],
+            "tsConfig": "tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
             "assets": [
-              "src/assets",
-              "src/favicon.ico"
+              "src/favicon.ico",
+              "src/assets"
             ]
           }
         },
@@ -100,7 +125,7 @@
         }
       }
     },
-    "angular-seed-e2e": {
+    "algo-ui-e2e": {
       "root": "",
       "sourceRoot": "",
       "projectType": "application",
@@ -109,7 +134,7 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "angular-seed:serve"
+            "devServerTarget": "algo-ui:serve"
           }
         },
         "lint": {
@@ -129,7 +154,7 @@
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
-      "style": "css"
+      "style": "scss"
     },
     "@schematics/angular:directive": {
       "prefix": "app"
