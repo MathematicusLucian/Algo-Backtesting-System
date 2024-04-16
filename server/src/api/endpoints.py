@@ -77,7 +77,7 @@ def helloworld():
 def ping():
     return jsonify({"status": 200, "msg":"I am the CryptoTracker Flask API"})
 
-@algo_rest_blueprint.route("api//2000")
+@algo_rest_blueprint.route("api/2000")
 def fetch_2000():
     with open('api_sample_data/user.json') as user_file:
         file_contents = user_file.read()
@@ -97,6 +97,17 @@ def fetch_audusd15m_():
         file_contents = user_file.read()
     parsed_json = json.loads(file_contents)
     return jsonify(parsed_json)
+
+# /// STRATEGIES ///
+
+# --------------------
+# ------- MACD -------
+# --------------------
+@algo_rest_blueprint.route('/macd_crypto/', methods=['GET'])
+def macd_crypto():
+    return determine_macd_crypto()
+
+
 
 # /api/currencies?selected=GBP
 @algo_rest_blueprint.route("/api/currencies")
