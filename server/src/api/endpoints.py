@@ -245,3 +245,15 @@ async def volume():
 # # check_sum.start()
 # # print(market_data_service)
 
+# /// METALS ///
+
+# --------------------
+# ------ GOLD ------
+# --------------------
+# http://127.0.0.1:5000/historic_values_today/USD/XAU/
+@algo_rest_blueprint.route('/historic_values_today/<base_curr>/<symbol>/', methods=['GET'])
+def historic_values(base_curr, symbol):
+    data = fetch_gold_price("", base_curr, symbol)
+    # if data == None:
+    #     return redirect(url_for('not_found'))
+    return jsonify(data)
