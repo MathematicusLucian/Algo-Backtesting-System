@@ -7,8 +7,11 @@
 
 .mat-drawer, .mat-drawer-inner-container {
     background-color: #00000f;
-    padding: 15px 0;
+    padding: 0px 14px;
     color: #fff;
+}
+
+.mat-drawer {
     border: 1px solid #ddd;
 }
 
