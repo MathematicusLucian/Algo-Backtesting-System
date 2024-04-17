@@ -1,6 +1,6 @@
 .mat-toolbar{
     width: 100%;
-    background-color: rgb(0, 0, 14);
+    background-color: #000001;
     border-bottom: 2px solid silver;
 }
 .mat-toolbar > .mat-toolbar-row > span {

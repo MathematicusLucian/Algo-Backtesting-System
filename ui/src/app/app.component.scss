@@ -99,14 +99,14 @@ main {
 
 /* Sidebar styles */
 .sidebar {
-  height: 100vh;
+  height: auto;
   width: 150px;
   /* Sidebar width */
-  position: fixed;
+  position: relative;
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: #111;
+  background-color: #000001;
   /* Dark background for better contrast */
   color: white;
   /* Light text for readability */
