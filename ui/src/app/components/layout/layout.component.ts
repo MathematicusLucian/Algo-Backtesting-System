@@ -5,15 +5,16 @@ import { BehaviorSubject } from 'rxjs';
 import { SideNavService } from '../../services/sidenav.service';
 import { RouterOutlet } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
+import { ListComponent } from '../list/list.component';
 
 @Component({
-  selector: 'prefab-sidenav',
+  selector: 'prefab-layout',
   templateUrl: 'layout.component.html',
   styleUrl: 'layout.component.scss',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NgFor, MatSidenav, MatSidenavContainer, MatSidenavContent, MatIcon],
+  imports: [CommonModule, ListComponent, RouterOutlet, NgFor, MatSidenav, MatSidenavContainer, MatSidenavContent, MatIcon],
 })
-export class Layout implements OnInit, OnChanges {
+export class LayoutComponent implements OnInit, OnChanges {
   @ViewChild('sidenav', {static: false}) public sidenav!: MatSidenav;
   @Input() pairs$: any = new BehaviorSubject<any[]>([]);
   pairs: any;
@@ -35,4 +36,6 @@ export class Layout implements OnInit, OnChanges {
     this.selectedPair = pair;
     this.pairSelected.emit(this.selectedPair)
   }
+
+  loadCharts = (e: any) => console.log('clicked'); //ngrx
 }

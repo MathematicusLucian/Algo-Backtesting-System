@@ -43,8 +43,6 @@ export const ROUTES: Route[] = [
   },
 ];
 
-// bootstrapApplication(AppComponent, appConfig)
-//   .catch((err) => console.error(err));
 bootstrapApplication(AppComponent, {
     providers: [
         // {

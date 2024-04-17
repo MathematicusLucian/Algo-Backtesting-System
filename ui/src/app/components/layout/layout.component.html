@@ -1,6 +1,6 @@
 <mat-sidenav-container class='app-drawer-container' fullscreen>
     <mat-sidenav #sidenav mode="side" #left position="start" opened>
-        <ng-container *ngTemplateOutlet="sidenavpairs"></ng-container>
+        <ng-container *ngTemplateOutlet="sidenavleft"></ng-container>
     </mat-sidenav>
     <mat-sidenav #sidenav mode="side" #right position="end" opened>
         <h3>Sentiment Analysis</h3>
@@ -12,11 +12,11 @@
     </mat-sidenav-content>
 </mat-sidenav-container>  
 
-<ng-template #sidenavpairs>
-    <h3>Pairs</h3>
-    <div class="pair" *ngFor="let pair of pairs" (click)="selectPair(pair)" class="pair-selector">
-        {{pair}}
-    </div>
+<ng-template #sidenavleft>
+    <prefab-list 
+        [pairs$]="pairs$ | async" [selectedPair]="selectedPair" [open]="true"
+        (pairSelected)="loadCharts($event)">
+    </prefab-list>
 </ng-template>
 
 <footer fxLayoutAlign="center end">
