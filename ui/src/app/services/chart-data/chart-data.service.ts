@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment as env } from '../../../environments/environment';
 
@@ -13,6 +13,8 @@ export class ChartDataService {
   constructor(private http: HttpClient) {}
 
   getChartDumps(): Observable<any> {
+    // console.log('chartData', chartData);
+    // return of(chartData); 
     return this.http.get(`${this.apiUrl}/dumps`);
   }
 

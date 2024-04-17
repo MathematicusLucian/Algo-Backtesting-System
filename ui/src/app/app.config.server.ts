@@ -1,21 +1,9 @@
 import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
 import { provideServerRendering } from '@angular/platform-server';
-import { appConfig } from './app.config';
-
-const serverConfig: ApplicationConfig = {
-  providers: [
-    provideServerRendering()
-  ]
-};
-
-export const config = mergeApplicationConfig(appConfig, serverConfig);
-
-
 // import { BrowserModule } from '@angular/platform-browser';
-// import { NgModule } from '@angular/core';
+// import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 // import { FormsModule } from '@angular/forms';
 // import { HttpClientModule } from '@angular/common/http';
-// import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 // import { MatCardModule } from "@angular/material/card";
 // import { MatToolbarModule } from "@angular/material/toolbar";
 // import { MatButtonModule } from "@angular/material/button";
@@ -26,8 +14,17 @@ export const config = mergeApplicationConfig(appConfig, serverConfig);
 // import { FlexLayoutModule } from "@angular/flex-layout";
 // import { NgxEchartsModule } from 'ngx-echarts';
 // import { AppComponent } from './app.component';
+import { appConfig } from './app.config';
 // import { HeaderComponent } from './components/header/header.component';
 // import { CardComponent } from './components/card/card.component';
+
+const serverConfig: ApplicationConfig = {
+  providers: [
+    provideServerRendering()
+  ]
+};
+
+export const config = mergeApplicationConfig(appConfig, serverConfig);
 
 // @NgModule({
 //   declarations: [

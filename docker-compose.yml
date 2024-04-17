@@ -7,7 +7,7 @@ services:
     image: nginx
     build:
       context: .
-      dockerfile: nginx/Dockerfile
+      dockerfile: deployment/Dockerfile_ui
     volumes:
      - ./ui/dist:/usr/share/nginx/html
     ports:
@@ -15,31 +15,33 @@ services:
       - "443:443"
     depends_on:
       - crypto_tracker_flask
-    # develop:
-    #   watch: #https://docs.docker.com/compose/file-watch/ #docker compose watch
-    #     - action: sync
-    #       path: ./ui/dist
-    #       target: /usr/share/nginx/html
-    #       ignore:
-    #         - venv/
-    #     - action: rebuild
-    #       path: requirements.txt
+    develop:
+      watch: #https://docs.docker.com/compose/file-watch/ #docker compose watch
+        - action: sync
+          path: ./ui/dist
+          target: /usr/share/nginx/html
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
 
   crypto_tracker_flask:
     container_name: crypto_tracker_flask_container
     restart: always
     image: flask
-    build: ./server
+    build: 
+      context: ./server
+      dockerfile: ../deployment/Dockerfile_server
     volumes:
      - ./server:/usr/src/app/server
     env_file:
      - .env
-    # develop:
-    #   watch:
-    #     - action: sync
-    #       path: ./flask_service
-    #       target: /usr/src/app/algo_flask
-    #       ignore:
-    #         - node_modules/
-    #     - action: rebuild
-    #       path: package.json
+    develop:
+      watch:
+        - action: sync
+          path: ./server
+          target: /usr/src/app/server
+          ignore:
+            - venv/
+        - action: rebuild
+          path: requirements.txt

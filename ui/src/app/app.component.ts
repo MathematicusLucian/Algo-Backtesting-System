@@ -21,7 +21,7 @@ import { IonicModule } from '@ionic/angular';
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit, AfterViewInit {
-  title: string = "AlgoTrading";
+  title: string = "Market Tracker";
   pairs: string[] = [];
   confidences: { [key: string]: string } = {}; // Object to hold confidence values
   lastTimestamps: { [key: string]: string } = {}; // Object to hold the last timestamp for each pair
@@ -118,14 +118,14 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
       });
     } else {
-    this.pairs.forEach((pair) => {
-      this.chartDataService.getModelBars(pair, 2000).subscribe((data: any) => {
-        if (Array.isArray(data)) {
-          this.createChart(pair, data);
-        }
+      this.pairs.forEach((pair) => {
+        this.chartDataService.getModelBars(pair, 2000).subscribe((data: any) => {
+          if (Array.isArray(data)) {
+            this.createChart(pair, data);
+          }
+        });
       });
-    });
-  }
+    }
   }
 
   cleanPair(pair: string): string {
@@ -255,6 +255,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.loadCharts();
   }
 }
+
 
 // import {Component, OnInit} from '@angular/core';
 // import {HttpClient} from '@angular/common/http';

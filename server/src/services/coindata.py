@@ -1,5 +1,6 @@
-from src.services.base import BaseService
 from livecoinwatch import LiveCoinWatch
+from datetime import datetime, timedelta
+from src.services.base import BaseService
 
 class CoinDataService(BaseService):
 
@@ -24,9 +25,11 @@ class CoinDataService(BaseService):
         return x
 
     # Call 'coins/single/history'
-    def get_historic_values__coin(self, second_currency, base):
+    def get_historic_values__coin(self, second_currency, base, days_back):
         base_currency = base if base!=None else self.base_currency
-        return self.coin_data_api.coin__history(code=second_currency,currency=base_currency,start=1617035100000,end=1617035400000)
+        period_start = (datetime.today() - timedelta(days=(days_back))).timestamp() * 1000
+        period_end = (datetime.today()).timestamp() * 1000
+        return self.coin_data_api.coin__history(code=second_currency,currency=base_currency,start=period_start,end=period_end)
 
     # Call 'coins/single/history'
     def get_historic_values__coins(self, coins):
@@ -40,3 +43,9 @@ class CoinDataService(BaseService):
     def get_latest_values(self, coins):
         return self.coin_data_api.coins__map(codes=coins, currency=self.base_currency, sort="rank", offset=0, limit=0)
    
+    # historic_values = []
+    # for i in range(1,(days_back+1))[::-1]:
+    #     period_start = (datetime.today() - timedelta(days=(i))).timestamp() * 1000
+    #     period_end = (datetime.today() - timedelta(days=(i-1))).timestamp() * 1000
+    #     day_range = self.coin_data_api.coin__history(code=second_currency,currency=base_currency,start=period_start,end=period_end)
+    #     historic_values.append(day_range)

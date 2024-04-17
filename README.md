@@ -41,7 +41,8 @@ There are two Docker containers:
 Both built using separate Dockerfiles, created and connected with Docker Compose, and which expand upon the respective official images from Docker Hub.
 
 ***Execute following commands:***
-  - Run with (watch): ``docker compose watch docker-compose.yml && docker compose up``
+  - Run with (watch): ``docker compose up --build --wait && docker compose alpha watch``
+  - ``docker compose watch docker-compose.yml && docker compose up``
   - ``docker-compose -f docker-compose.yml up --build``
   - Without cache ``docker-compose build --no-cache``
 
