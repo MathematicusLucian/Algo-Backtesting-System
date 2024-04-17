@@ -13,9 +13,7 @@
 </mat-sidenav-container>  
 
 <ng-template #sidenavleft>
-    <prefab-list 
-        [pairs$]="pairs$ | async" [selectedPair]="selectedPair" [open]="true"
-        (pairSelected)="loadCharts($event)">
+    <prefab-list [pairs$]="pairs$ | async" [selectedPair]="selectedPair" [open]="true">
     </prefab-list>
 </ng-template>
 

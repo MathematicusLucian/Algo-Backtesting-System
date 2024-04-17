@@ -2,8 +2,14 @@ import { Component, OnInit, AfterViewInit, HostListener, ChangeDetectionStrategy
 import { CommonModule } from '@angular/common';
 import { environment as env } from '../../../environments/environment';
 import * as LightweightCharts from 'lightweight-charts';
-import { BehaviorSubject, Observable, Subject, of } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subject, Subscription, of } from 'rxjs';
+import { Store, select, Action } from '@ngrx/store';
+import { ListState, selectItemClicked } from '../../state/list/list.state';
+import { ClickListItem, CLICK_LIST_ITEM } from '../../state/list/list.actions';
+import { ListReducer } from '../../state/list/list.reducers';
+import List from '../../models/list.model';
+import ActionWithPayload from '../../state/action-with-payload';
+import { debounceTime, map } from 'rxjs/operators';
 import { IonicModule } from '@ionic/angular';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatOption, MatSelect } from '@angular/material/select';
@@ -45,8 +51,13 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   coinHistoryData: CoinValue[] = [];
   chartContainer: any;
   private resizeSubject: Subject<void> = new Subject();
+  ListState$!: Observable<string|null|undefined>;
+  ListSubscription!: Subscription;
+  ItemClicked: string|null|undefined = null;
+  ListList!: List[];
 
   constructor(
+    private store: Store<ListState>,
     private currencyDataService: CurrencyDataService, 
     private chartDataService: ChartDataService
   ) { 
@@ -70,6 +81,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.dataLoaded = false;
       }
     );
+    this.ListState$ = this.store.pipe(select(selectItemClicked));
+    this.ListSubscription = this.ListState$.pipe(map(x => this.ItemClicked = x)).subscribe();
   }
 
   ngAfterViewInit(): void {
@@ -134,5 +147,9 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   loadCharts = (e: any) => {
     console.log('e', e);
     this.chartDataService.loadCharts(null, this.chart, this.pairs, this.selectedPair, this.lastTimestamps, this.isDarkModeEnabled);
+  }
+
+  ngOnDestroy() {
+    this.ListSubscription.unsubscribe();
   }
 }
