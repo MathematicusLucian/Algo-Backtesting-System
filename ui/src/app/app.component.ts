@@ -1,22 +1,35 @@
-import { Component, ElementRef, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, AfterViewInit, ViewChild, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { DeepPartial, TimeChartOptions, ColorType, createChart } from 'lightweight-charts';
+import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-import { ChartDataService } from './services/chart-data/chart-data.service';
+import { Observable, of } from 'rxjs';
+import { DeepPartial, TimeChartOptions, ColorType, createChart } from 'lightweight-charts';
 import * as LightweightCharts from 'lightweight-charts';
 import { SeriesMarker } from 'lightweight-charts';
-// import time from lightweight-charts
 import { Time } from 'lightweight-charts';
-import { HostListener } from '@angular/core';
+import { ChartDataService } from './services/chart-data/chart-data.service';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { IonicModule } from '@ionic/angular';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatOption, MatSelect } from '@angular/material/select';
+import { HeaderComponent } from './components/header/header.component';
+import { MatInput } from '@angular/material/input';
+
+interface Currency {
+  name: string;
+  code: string;
+}
+interface CoinValue {
+  date: string,
+  price: string
+}
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [IonicModule, CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, HeaderComponent, IonicModule, MatFormField, MatInput, MatSelect, MatOption, MatLabel],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -29,11 +42,19 @@ export class AppComponent implements OnInit, AfterViewInit {
   isDarkModeEnabled = true;
   selectedPair: string = "";
   chart: LightweightCharts.IChartApi | null = null;
+  chartStyling: any;
+  BASE_URL = "http://localhost/api/";
+  baseCurrencyMenu: Currency[] = [];
+  secondCurrencyMenu: Currency[] = [];
+  selectedBaseCurrency: any;
+  selectedSecondCurrency: any;
+  isChartDataSuccess: boolean = false;
+  coinHistoryData: CoinValue[] = [];
   private resizeSubject: Subject<void> = new Subject();
   private candleSeries: LightweightCharts.ISeriesApi<'Candlestick'> | null = null;
   private lineSeries: LightweightCharts.ISeriesApi<'Line'> | null = null;
 
-  constructor(private chartDataService: ChartDataService) {
+  constructor(private http: HttpClient, private chartDataService: ChartDataService) {
     this.resizeSubject.pipe(debounceTime(100)).subscribe(() => {
       this.adjustChartSize();
     });
@@ -53,6 +74,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.setupBaseCurrencyDropdown();
     this.chartDataService.getChartDumps().subscribe(
       (dumps: any) => {
         this.pairs = dumps.map((dump: string) => this.cleanPair(dump));
@@ -101,17 +123,49 @@ export class AppComponent implements OnInit, AfterViewInit {
     );
   }
 
+  setupBaseCurrencyDropdown = (): void => {
+    const currencies_endpoint = `currencies`;
+    this.http.get<any>(this.BASE_URL + currencies_endpoint).subscribe(data => {
+      this.baseCurrencyMenu = data["res"];
+      this.selectedBaseCurrency = data["res"][0]["code"];
+      this.setupSecondCurrencyDropdown();
+    })
+  }
+
+  setupSecondCurrencyDropdown = (): void => {
+    const currencies_endpoint = `currencies?selected=${this.selectedBaseCurrency}`;
+    this.http.get<any>(this.BASE_URL + currencies_endpoint).subscribe(data => {
+      this.secondCurrencyMenu = data["res"];
+      this.selectedSecondCurrency = data["res"][1]["code"];
+    })
+  }
+
+  fetchCoinData = (): void => {
+    const period = "7";
+    const round_results_endpoint = `coin_history?base=${this.selectedBaseCurrency}&second_currency=${this.selectedSecondCurrency}&period=${period}`;
+    this.http.get<any>(this.BASE_URL + round_results_endpoint).subscribe(data => {
+      this.isChartDataSuccess = true;
+      this.coinHistoryData = data;
+    })
+  }
+
+  selectBaseCurrency = (event: Event): void => {
+    this.selectedBaseCurrency = (event.target as HTMLSelectElement).value;
+    this.setupSecondCurrencyDropdown();
+  }
+
+  selectSecondCurrency = (event: Event): void => {
+    this.selectedSecondCurrency = (event.target as HTMLSelectElement).value;
+    this.fetchCoinData();
+  }
+
   selectPair(pair: string): void {
     this.selectedPair = pair;
-    // Assuming loadCharts can now handle loading a single chart,
-    // modify it accordingly if needed.
     this.loadCharts();
   }
 
   loadCharts(): void {
-    // Adjust this method to either load all charts or just the one for selectedPair
     if (this.selectedPair != "") {
-      // Load chart only for the selected pair
       this.chartDataService.getModelBars(this.selectedPair, 2000).subscribe((data: any) => {
         if (Array.isArray(data)) {
           this.createChart(this.selectedPair, data);
@@ -129,10 +183,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   cleanPair(pair: string): string {
-    // Check if pair is undefined or null
-    if (!pair) {
-      return ''; // Return an empty string or handle it as you see fit
-    }
+    if (!pair) return '';
     return pair.replace(/[^a-zA-Z0-9]/g, '');
   }
 
@@ -142,21 +193,22 @@ export class AppComponent implements OnInit, AfterViewInit {
     const year = date.getFullYear();
     const hours = ('0' + date.getHours()).slice(-2);
     const minutes = ('0' + date.getMinutes()).slice(-2);
-
-    // Formatting the date string as "dd-mm-yyyy hh:mm"
     return `${day}-${month}-${year} ${hours}:${minutes}`;
   }
 
-  createChart(pair: string, data: any[]): void {
-    const chartContainer = document.getElementById('chartContainer');
-    // Clear the old chart before creating a new one
+  destroyChart() {
     if (this.chart) {
-      this.chart.remove();
+      this.chart.remove(); // Clear the old chart before creating a new one
       this.chart = null;
     }
+  }
+
+  createChart(pair: string, data: any[]): void {
+    this.destroyChart();
+    const chartContainer = document.getElementById('chartContainer');
     if (!chartContainer) return;
     if (!this.chart) {
-      this.chart = LightweightCharts.createChart(chartContainer, {
+      this.chartStyling = {
         width: chartContainer.clientWidth,
         height: 400,
         layout: {
@@ -180,13 +232,13 @@ export class AppComponent implements OnInit, AfterViewInit {
           borderColor: 'rgba(197, 203, 206, 0.8)',
           timeVisible: true,
         },
-      });
+      };
+      this.chart = LightweightCharts.createChart(chartContainer, this.chartStyling);
     }
     
     // Assuming data is sorted and the last element is the latest
     if (data && data.length > 0) {
         const lastData = data[data.length - 1];
-        // Extract the last timestamp from the data
         const lastTimestamp = this.formatDateToDDMMYYYYHHMM(new Date(lastData.time * 1000));
         this.lastTimestamps[pair] = lastTimestamp;
     }
@@ -243,8 +295,7 @@ export class AppComponent implements OnInit, AfterViewInit {
           text: confidence.value,
         }));
 
-        // Ensure candleSeries is not null before setting markers
-        if (this.candleSeries)
+        if (this.candleSeries) // Ensure candleSeries is not null before setting markers
         this.candleSeries.setMarkers(markers);
       }
     });
@@ -254,120 +305,5 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.isDarkModeEnabled = !this.isDarkModeEnabled;
     this.loadCharts();
   }
+
 }
-
-
-// import {Component, OnInit} from '@angular/core';
-// import {HttpClient} from '@angular/common/http';
-// import { Observable, of } from 'rxjs';
-
-// interface Currency {
-//   name: string;
-//   code: string;
-// }
-// interface CoinValue {
-//   date: string,
-//   price: string
-// }
-
-// @Component({
-//   selector: 'app-root',
-//   templateUrl: './app.component.html',
-//   styleUrls: ['./app.component.css']
-// })
-// export class AppComponent implements OnInit {
-//   title = 'CryptoTracker';
-//   BASE_URL = "http://localhost/api/";
-//   baseCurrencyMenu: Currency[] = null;
-//   secondCurrencyMenu: Currency[] = null;
-//   selectedBaseCurrency: any;
-//   selectedSecondCurrency: any;
-//   isChartDataSuccess: boolean = false;
-//   coinHistoryData: CoinValue[] = null;
-//   constructor(private http: HttpClient) { }
-
-//   ngOnInit(): void {
-//     this.setupBaseCurrencyDropdown();
-//   }
-
-//   setupBaseCurrencyDropdown = (): void => {
-//     const currencies_endpoint = `currencies`;
-//     this.http.get<any>(this.BASE_URL + currencies_endpoint).subscribe(data => {
-//       this.baseCurrencyMenu = data["res"];
-//       this.selectedBaseCurrency = data["res"][0]["code"];
-//       this.setupSecondCurrencyDropdown();
-//     })
-//   }
-
-//   setupSecondCurrencyDropdown = (): void => {
-//     const currencies_endpoint = `currencies?selected=${this.selectedBaseCurrency}`;
-//     this.http.get<any>(this.BASE_URL + currencies_endpoint).subscribe(data => {
-//       this.secondCurrencyMenu = data["res"];
-//       this.selectedSecondCurrency = data["res"][1]["code"];
-//     })
-//   }
-
-//   fetchCoinData = (): void => {
-//     const period = "7";
-//     const round_results_endpoint = `coin_history?base=${this.selectedBaseCurrency}&second_currency=${this.selectedSecondCurrency}&period=${period}`;
-//     this.http.get<any>(this.BASE_URL + round_results_endpoint).subscribe(data => {
-//       this.isChartDataSuccess = true;
-//       this.coinHistoryData = data;
-//     })
-//   }
-
-//   selectBaseCurrency = (event: Event): void => {
-//     this.selectedBaseCurrency = (event.target as HTMLSelectElement).value;
-//     this.setupSecondCurrencyDropdown();
-//   }
-
-// 	selectSecondCurrency = (event: Event): void => {
-//     this.selectedSecondCurrency = (event.target as HTMLSelectElement).value;
-//     this.fetchCoinData();
-// 	}
-
-// }
-
-
-// <prefab-header></prefab-header>
-
-// <div id="main">
-
-//   <div *ngIf="baseCurrencyMenu?.length">
-
-//     <mat-form-field>
-//       <!-- <mat-label>Base:</mat-label> -->
-//       <select matNativeControl (change)="selectBaseCurrency($event)">
-//         @for (option of baseCurrencyMenu; track option) {
-//           <option [value]="option.code" [selected]="selectedBaseCurrency === option.code">{{ option.name }}</option>
-//         }
-//       </select>
-//     </mat-form-field>
-
-//     <span>to</span>
-
-//     <div id="menu-wrapper" *ngIf="secondCurrencyMenu?.length">
-
-//       <mat-form-field>
-//         <!-- <mat-label>Currency:</mat-label> -->
-//         <select matNativeControl (change)="selectSecondCurrency($event)">
-//           @for (option of secondCurrencyMenu; track option) {
-//             <option [value]="option.code" [selected]="selectedSecondaryCurrency === option.code">{{ option.name }}</option>
-//           }
-//         </select>
-//       </mat-form-field>
-
-//     </div>
-
-//   </div>
-
-//   <!-- If time, would add a spinner -->
-//   <h1 *ngIf="!isChartDataSuccess">Loading . . . </h1>
-
-//   <div *ngIf="isChartDataSuccess">
-      
-//     <pre>{{coinHistoryData|json}}</pre>
-
-//   </div>
-
-// </div>

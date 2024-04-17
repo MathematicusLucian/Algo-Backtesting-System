@@ -2,6 +2,7 @@ import {Component, OnInit, Input} from '@angular/core';
 
 @Component({
   selector: 'prefab-card',
+  standalone: true,
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.css']
 })
