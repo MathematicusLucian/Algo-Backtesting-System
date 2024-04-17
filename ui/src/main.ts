@@ -18,7 +18,7 @@ import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterModule } from '@angular/router';
+import { Route, RouterModule } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { appConfig } from './app/app.config';
@@ -32,9 +32,16 @@ if (environment.production) {
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
-// export const ROUTES: Route[] = [
-//   {path: 'admin', loadComponent: () => import('./admin/panel.component').then(mod => mod.AdminPanelComponent)},
-// ];
+export const ROUTES: Route[] = [
+  {
+    path: '', 
+    loadComponent: () => import('./app/components/dashboard/dashboard.component').then(mod => mod.DashboardComponent)
+  },
+  {
+    path: '**',
+    redirectTo: '',
+  },
+];
 
 // bootstrapApplication(AppComponent, appConfig)
 //   .catch((err) => console.error(err));
@@ -48,7 +55,7 @@ bootstrapApplication(AppComponent, {
             StoreModule.forRoot({}),
             StoreDevtoolsModule.instrument(),
             SideNavService,
-            // RouterModule.forRoot(ROUTES),
+            RouterModule.forRoot(ROUTES),
           ],
           BrowserModule, FormsModule, MatCardModule, 
           MatToolbarModule, MatButtonModule, MatIconModule,

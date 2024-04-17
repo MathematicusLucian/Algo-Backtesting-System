@@ -9,7 +9,7 @@ import { MatIcon } from '@angular/material/icon';
   standalone: true,
   imports: [ MatSidenav, MatToolbar, MatToolbarRow, MatIcon],
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  styleUrls: ['./header.component.scss']
 })
 // @Injectable({providedIn: 'root'})
 export class HeaderComponent {
