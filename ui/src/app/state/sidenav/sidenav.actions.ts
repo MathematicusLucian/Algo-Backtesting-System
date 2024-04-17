@@ -1,0 +1,3 @@
+{
+    type: '[Sidenav] Show Sidenav';
+}

@@ -25,6 +25,7 @@ import { appConfig } from './app/app.config';
 import 'zone.js';
 import './polyfills';
 import { SideNavService } from './app/services/sidenav.service';
+import { ListReducer } from './app/state/list/list.reducers';
 
 if (environment.production) {
   enableProdMode();
@@ -55,21 +56,13 @@ bootstrapApplication(AppComponent, {
             SideNavService,
             RouterModule.forRoot(ROUTES),
           ],
-          BrowserModule, FormsModule, MatCardModule, 
-          MatToolbarModule, MatButtonModule, MatIconModule,
+          StoreModule.forRoot({ list: ListReducer }),
+          BrowserModule, FormsModule, FlexLayoutModule,
+          MatToolbarModule, MatCardModule, MatButtonModule, MatIconModule,
           MatFormFieldModule, MatSelectModule, MatInputModule, 
-          FlexLayoutModule, NgxEchartsModule.forRoot({
-            /**
-             * This will import all modules from echarts.
-             * If you only need custom modules,
-             * please refer to [Custom Build] section.
-             */
-            echarts: () => import('echarts'), // or import('./path-to-my-custom-echarts')
-        })),
+          NgxEchartsModule.forRoot({ echarts: () => import('echarts')})),
         provideHttpClient(withInterceptorsFromDi()),
         provideAnimations(),
-        // {provide: BACKEND_URL, useValue: 'https://photoapp.looknongmodules.com/api'},
-        // provideRouter([/* app routes */]),
     ]
 })
 .then((ref) => {
