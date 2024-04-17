@@ -1,0 +1,24 @@
+<mat-sidenav-container class='app-drawer-container' fullscreen>
+    <mat-sidenav #sidenav mode="side" #left position="start" opened>
+        <ng-container *ngTemplateOutlet="sidenavpairs"></ng-container>
+    </mat-sidenav>
+    <mat-sidenav #sidenav mode="side" #right position="end" opened>
+        <h3>Sentiment Analysis</h3>
+    </mat-sidenav>
+    <mat-sidenav-content class="app-content">
+
+        <router-outlet></router-outlet>
+        
+    </mat-sidenav-content>
+</mat-sidenav-container>  
+
+<ng-template #sidenavpairs>
+    <h3>Pairs</h3>
+    <div class="pair" *ngFor="let pair of pairs" (click)="selectPair(pair)" class="pair-selector">
+        {{pair}}
+    </div>
+</ng-template>
+
+<footer fxLayoutAlign="center end">
+<button class="button"><mat-icon>keyboard_arrow_down</mat-icon></button>
+</footer>

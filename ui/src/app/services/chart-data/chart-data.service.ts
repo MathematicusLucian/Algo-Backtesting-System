@@ -32,6 +32,7 @@ export class ChartDataService {
   }
 
   loadCharts(e: any, chart: any, pairs: any, selectedPair: any, lastTimestamps: any, isDarkModeEnabled: any): void {
+    console.log('selectedPair', selectedPair);
     if (selectedPair != "") {
       this.getModelBars(selectedPair, 2000).subscribe((data: any) => {
         if (Array.isArray(data)) {
@@ -39,8 +40,11 @@ export class ChartDataService {
         }
       });
     } else {
+      console.log('pairs', pairs);
       pairs.forEach((pair: any) => {
+        console.log('pair', pair);
         this.getModelBars(pair, 2000).subscribe((data: any) => {
+          console.log('modelBars data', data);
           if (Array.isArray(data)) {
             this.createChart(chart, pair, data, lastTimestamps, isDarkModeEnabled);
           }
@@ -107,20 +111,25 @@ export class ChartDataService {
   createChart(chart: any, pair: string, data: any[], lastTimestamps: any, isDarkModeEnabled: any): void {
     this.destroyChart(chart);
     const chartContainer = document.getElementById('chartContainer');
+    console.log('create chart', chartContainer);
     if (!chartContainer) return;
     if (!chart) {
       chart = LightweightCharts.createChart(chartContainer, this.createChartStyling(chartContainer, isDarkModeEnabled));
     } 
+    console.log('create chart - 1', chart);
+    console.log('create chart - data', data);
     if (data && data.length > 0) {    // Assuming data is sorted and the last element is the latest
         const lastData = data[data.length - 1];
         const lastTimestamp = this.formatDateToDDMMYYYYHHMM(new Date(lastData.time * 1000));
         lastTimestamps[pair] = lastTimestamp;
     }
     let candleSeries: LightweightCharts.ISeriesApi<'Candlestick'> | null = this.updateCandleSeries(chart, data);
+    console.log('create chart - candleSeries', candleSeries);
     let lineSeries: LightweightCharts.ISeriesApi<'Line'> | null = chart.addLineSeries({
       color: 'rgba(0, 150, 136, 1)',
       lineWidth: 2,
     });
+    console.log('create chart - lineSeries', lineSeries);
     this.setPrediction(pair, lineSeries);
     this.setConfidences(pair, candleSeries);
   }

@@ -1,0 +1,23 @@
+.app-drawer-container {
+    background-color: #010101;
+    color: #fff;
+    flex: 1;
+    padding: 0 7px;
+}
+
+.mat-drawer, .mat-drawer-inner-container {
+    background-color: #00000f;
+    padding: 15px 0;
+    color: #fff;
+    border: 1px solid #ddd;
+}
+
+.pair {
+    margin-right: 4px;
+}
+  
+.app-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}

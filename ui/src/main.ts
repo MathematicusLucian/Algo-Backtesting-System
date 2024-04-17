@@ -24,6 +24,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { appConfig } from './app/app.config';
 import 'zone.js';
 import './polyfills';
+import { SideNavService } from './app/services/sidenav.service';
 
 if (environment.production) {
   enableProdMode();
@@ -46,6 +47,7 @@ bootstrapApplication(AppComponent, {
             BrowserAnimationsModule,
             StoreModule.forRoot({}),
             StoreDevtoolsModule.instrument(),
+            SideNavService,
             // RouterModule.forRoot(ROUTES),
           ],
           BrowserModule, FormsModule, MatCardModule, 

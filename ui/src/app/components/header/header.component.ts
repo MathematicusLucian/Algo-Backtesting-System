@@ -1,18 +1,21 @@
-import { Component, OnInit } from '@angular/core';
-import { MatToolbar, MatToolbarModule, MatToolbarRow } from "@angular/material/toolbar";
-import { MatIcon, MatIconModule } from '@angular/material/icon';
+import { Component, Injectable } from '@angular/core';
+import { SideNavService } from '../../services/sidenav.service';
+import { MatSidenav } from '@angular/material/sidenav';
+import { MatToolbar, MatToolbarRow } from "@angular/material/toolbar";
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'prefab-header',
   standalone: true,
-  imports: [MatToolbar, MatToolbarRow, MatIcon],
+  imports: [ MatSidenav, MatToolbar, MatToolbarRow, MatIcon],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit {
+// @Injectable({providedIn: 'root'})
+export class HeaderComponent {
+  title: string = "Dashboard";      
 
-  constructor() { }
+  constructor(private sideNavService: SideNavService) { } 
 
-  ngOnInit(): void {}
-
+  clickMenu = () => this.sideNavService.toggle();
 }

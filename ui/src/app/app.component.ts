@@ -1,34 +1,39 @@
-import { Component, OnInit, AfterViewInit, HostListener } from '@angular/core';
+import { Component, OnInit, AfterViewInit, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { environment as env } from '../environments/environment';
 import * as LightweightCharts from 'lightweight-charts';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, of } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { IonicModule } from '@ionic/angular';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { HeaderComponent } from './components/header/header.component';
 import { MatInput } from '@angular/material/input';
-import { MatSidenavContainer, MatSidenavContent } from '@angular/material/sidenav';
-import { Sidenav } from './components/sidenav/sidenav.component';
+import { MatSidenav, MatSidenavContainer, MatSidenavContent } from '@angular/material/sidenav';
+import { Layout } from './components/layout/layout.component';
 import { ChartDataService } from './services/chart-data/chart-data.service';
 import { CurrencyDataService, Currency, CoinValue } from './services/currency-data/currency-data.service';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, RouterOutlet, 
     IonicModule, 
-    HeaderComponent, Sidenav,
-    MatSidenavContainer, MatSidenavContent, 
-    MatFormField, MatInput, MatSelect, MatOption, MatLabel],
+    HeaderComponent, Layout,
+    MatSidenav, MatSidenavContainer, MatSidenavContent, 
+    MatFormField, MatInput, MatSelect, MatOption, MatLabel,
+    MatIcon,
+  ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit, AfterViewInit {
   public apiUrl = env.apiUrl;
   pairs: string[] = [];
+  pairs$: any = new BehaviorSubject<any[]>([]);
   confidences: { [key: string]: string } = {};
   lastTimestamps: { [key: string]: string } = {}; // Last timestamp for each pair
   dataLoaded = false;
@@ -116,6 +121,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   setupChart(dumps: any) {
     this.pairs = dumps.map((dump: string) => this.chartDataService.cleanPair(dump));
+    this.pairs$.next(this.pairs);
     console.log('pairs', this.pairs);
     this.dataLoaded = true;
     this.chartDataService.loadCharts(null, this.chart, this.pairs, this.selectedPair, this.lastTimestamps, this.isDarkModeEnabled);
@@ -129,5 +135,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
   }
 
-  loadCharts = (e: any) => this.chartDataService.loadCharts(null, this.chart, this.pairs, this.selectedPair, this.lastTimestamps, this.isDarkModeEnabled);
+  loadCharts = (e: any) => {
+    console.log('e', e);
+    this.chartDataService.loadCharts(null, this.chart, this.pairs, this.selectedPair, this.lastTimestamps, this.isDarkModeEnabled);
+  }
 }

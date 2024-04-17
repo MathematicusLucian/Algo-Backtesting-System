@@ -18,7 +18,7 @@ $theme: mat.define-light-theme((
 // @include cdk-overlay();
 @include mat.core();
 * {
-  font-family: Lato;
+  font-family: Lato, 'Fira Code', Roboto;
 }
 
 $color-primary: #4571c4;
@@ -30,9 +30,10 @@ body {
 }
 body {
   background: #0f0f0f;
+  margin: 0 auto !important;
+  height: 100%;
   text-align: center;
   color: #fff;
-  margin: 0 auto !important;
 }
 .ag-theme-quartz {
   --ag-background-color: #ddd;
