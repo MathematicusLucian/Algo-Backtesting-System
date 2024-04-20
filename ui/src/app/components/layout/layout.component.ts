@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 import { SideNavService } from '../../services/sidenav.service';
 import { RouterOutlet } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
-import { ListComponent } from '../list/list.component';
+// import { ListComponent } from '../../../../../list/list.component';
 // import { ShowSidenav } from '../../state/sidenav';
 
 @Component({
@@ -13,8 +13,8 @@ import { ListComponent } from '../list/list.component';
   templateUrl: 'layout.component.html',
   styleUrl: 'layout.component.scss',
   standalone: true,
-  imports: [CommonModule, ListComponent, RouterOutlet, NgFor, MatSidenav, MatSidenavContainer, MatSidenavContent, MatIcon],
-})
+  imports: [CommonModule, RouterOutlet, NgFor, MatSidenav, MatSidenavContainer, MatSidenavContent, MatIcon],
+}) //ListComponent
 export class LayoutComponent implements OnInit, OnChanges {
   @ViewChild('sidenav', {static: false}) public sidenav!: MatSidenav;
   @Input() pairs$: any = new BehaviorSubject<any[]>([]);

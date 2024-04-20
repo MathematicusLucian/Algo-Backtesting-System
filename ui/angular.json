@@ -52,12 +52,10 @@
               "optimization": true,
               "outputHashing": "all"
             },
-              "optimization": true,
             "development": {
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "vendorChunk": false,

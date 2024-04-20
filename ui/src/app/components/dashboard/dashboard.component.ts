@@ -1,14 +1,14 @@
-import { Component, OnInit, AfterViewInit, HostListener, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, HostListener, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { environment as env } from '../../../environments/environment';
 import * as LightweightCharts from 'lightweight-charts';
 import { BehaviorSubject, Observable, Subject, Subscription, of } from 'rxjs';
 import { Store, select, Action } from '@ngrx/store';
 import { ListState, selectItemClicked } from '../../state/list/list.state';
-import { ClickListItem, CLICK_LIST_ITEM } from '../../state/list/list.actions';
-import { ListReducer } from '../../state/list/list.reducers';
+// import { ClickListItem, CLICK_LIST_ITEM } from '../../state/list/list.actions';
+// import { ListReducer } from '../../state/list/list.reducers';
 import List from '../../models/list.model';
-import ActionWithPayload from '../../state/action-with-payload';
+// import ActionWithPayload from '../../state/action-with-payload';
 import { debounceTime, map } from 'rxjs/operators';
 import { IonicModule } from '@ionic/angular';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
@@ -31,7 +31,7 @@ import { MatIcon } from '@angular/material/icon';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 // @Injectable({providedIn: 'root'})
-export class DashboardComponent implements OnInit, AfterViewInit {
+export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   title: string = "Dashboard";      
   public apiUrl = env.apiUrl;
   pairs: string[] = [];
