@@ -65,6 +65,7 @@ opt-einsum==3.3.0
 optree==0.11.0
 packaging==24.0
 pandas==2.2.1
+pandas_ta
 pathlib
 pillow==10.3.0
 plotly
@@ -98,6 +99,7 @@ six==1.16.0
 snscrape==0.7.0.20230622
 soupsieve==2.5
 sympy==1.12
+ta==0.11.0
 tensorboard==2.16.2
 tensorboard-data-server==0.7.2
 tensorflow==2.16.1

@@ -23,7 +23,7 @@ This service imports my LiveCoinWatch library, which is an interface to the [Liv
 ### UI (TypeScript)
 ***Angular:*** Front-End JavaScript framework.
 
-# Algo-Bot
+``ng generate component components/list --style=scss --project=algo-ui``
 
 ## Run
 
@@ -81,34 +81,6 @@ Prune Docker regularly:
 - Create: ``python3 -m venv venv``
 - Active: ``source venv/bin/activate``
 - ***Requirements:***``pip freeze -r requirements.txt | sed '/freeze/,$ d'``
-
-## Tests
-
-### Running the Python Tests
-- Flask (Python) unit tests are in the `server/tests` directory and managed by `manage .py` Python file.
-- Run with: ``docker-compose -f docker-compose.yml run --rm algo_flask python manage.py test``
-
-### Running UI unit tests
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Architecture
-
-### Docker
-  - Docker Compose to build and host app: ```docker-compose.yml``` to create containers and run the app. Several versions, i.e. for different environments.
-  - Reverse proxy (`nginx`) - web server, and reverse proxy. External user hits the nginx - distributes request to UI or 
-
-### Microservice (Python)
-
-***Flask*** app: including tests setup, configs and settings files, Dockerfile for running the Flask container, etc..
-  - Flask - Back-End Python framework.
-  - ```.env``` variable: Environment variables for Flask and SQLite3. Several versions, i.e. for different environments.
-  - Optimised for large scale app structure, with `Blueprints`, `application factory` and several configs that can be extended from this seed project to any Prod-ready app.
-  - uwsgi - WSGI server - direct support for popular NGINX web 
-  - Flask code Testing.
-
-### UI (TypeScript)
-
-***Angular:*** Front-End JavaScript framework.
 
 ## APIs
 
