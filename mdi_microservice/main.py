@@ -30,7 +30,7 @@ pair_key = 'BTC-GBP'
 pair_data = stock_pairs_dict[pair_key]
 
 # --- SMA ---
-sma.sma_strategy(stock_pairs_dict, signals, days_collection)
+sma.calculate_sma(stock_pairs_dict, signals, days_collection)
 sma_chart(pair_key, pair_data, start_date, end_date, days_collection)
 
 # --- MACD ---

@@ -9,18 +9,18 @@ from pandas_datareader import data as pdr
 import yfinance as yfin
 yfin.pdr_override()
 
-def simple_moving_average(df: pd.DataFrame, days):
+def calculate_sma__days(df: pd.DataFrame, days):
     return ta.sma(df['Close'], int(days))
 
-def sma_strategy(stock_pairs_dict, signals, days_collection):
+def calculate_sma(stock_pairs_dict, signals, days_collection):
     index = 0
     for pair_name in stock_pairs_dict:
         index = index + 1
         data = stock_pairs_dict[pair_name]
-        # stock_pairs_dict[pair_name].to_csv(f'sma-{index}.csv', sep=',', index=False, encoding='utf-8')
         for days in days_collection:
-            data[f'SMA {days}'] = simple_moving_average(data, days)
+            data[f'SMA {days}'] = calculate_sma__days(data, days)
         data[f'SMA {signals[0]}'], data[f'SMA {signals[1]}'] = sma_strategy_buy_sell(data)
+        # stock_pairs_dict[pair_name].to_csv(f'sma-{index}.csv', sep=',', index=False, encoding='utf-8')
         # data.to_csv(f'strategy-output-{pair_name}.csv', sep=',', index=False, encoding='utf-8')
 
 def sma_strategy_buy_sell(df: pd.DataFrame):
