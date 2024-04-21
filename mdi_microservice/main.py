@@ -4,6 +4,7 @@ import pandas_ta as ta
 from ta import momentum
 from src.services.strategy.macd import MACD
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 base="USD"
 second_currency="BTC"
@@ -30,15 +31,26 @@ def plot(df: pd.DataFrame, indicator: str):
     elif indicator == "sma":
         plt.plot(df.Date, df.SMA_100)
 
+def create_plot_graph(df: pd.DataFrame):
+    plt.plot(df.Date, df.Close)
+    append_rsi_to_df(df)
+    append_sma_to_df(df)
+    df.ta.indictators()
+    plot(df, "rsi")
+    plot(df, "sma")
+    plt.show()
+
 macd_obj = MACD(base, second_currency, period, fast, slow, signal)
 df = macd_obj.df
 # print(df)
-plt.plot(df.Date, df.Close)
-append_rsi_to_df(df)
-plot(df, "rsi")
-append_sma_to_df(df)
-plot(df, "sma")
-plt.show()
+fig = go.Figure(data=[go.Candlestick(
+    x=df.Date,
+    open=df.Open,
+    high=df.High,
+    low=df.Low,
+    close=df.Close
+)])
+fig.show()
 
 # print("\n\n"+macd_obj.macd.to_json(orient='table'))
 # print("\n\n"+macd_obj.macd.to_json(orient ='records'))
