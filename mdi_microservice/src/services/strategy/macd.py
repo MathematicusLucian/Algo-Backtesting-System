@@ -1,110 +1,91 @@
-import yfinance as yf
-yf.pdr_override()
-import pandas as pd
-import ta
+from datetime import date
 import numpy as np
-from plotly.subplots import make_subplots
+import pandas as pd
+import pandas_ta as ta
+from ta import momentum
+from src.services.strategy._old_macd import MACD
+import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+from pandas_datareader import data as pdr
+import yfinance as yfin
+yfin.pdr_override()
 
-ta_sample_data = "./src/services/strategy/datas.csv"
-btc_historic_data = "./src/services/strategy/Binance_BTCGBP_d.csv"
+def calculate_macd(df) -> pd.DataFrame:
+    return ta.macd(df['Close'])
 
-class MACD:
-    def __init__(self, base, second_currency, period, fast=12, slow=26, signal=9):
-        self.colour_negative = '#006A4E'
-        self.colour_positive = '#8e1600'
-        pair = str(f'{second_currency}-{base}')
-        self.df=self.get_currency_data(pair, period)
-        # self.df:DataFrame=self.get_currency_data(str(f'{second_currency}-{base}'), period)
-        # # self.macd:DataFrame=self.calculate_MACD()
-        # # self.macd.columns=[x.lower() for x in self.macd.columns]
-        # self.fast=fast
-        # self.slow=slow
-        # self.signal=signal
-        # self.macdh_config = str(f'macdh_{fast}_{slow}_{signal}')
-        # self.macds_config = str(f'macds_{fast}_{slow}_{signal}')
+def macd_color(df):
+    macd_color = []
+    for (index, row), ii in zip(df.iterrows(), range(len(df.index))):
+        if row['MACDh_12_26_9'] > df.iloc[ii-1]['MACDh_12_26_9']:
+            macd_color.append(True)
+        else:
+            macd_color.append(False)
+    return macd_color
 
-    def get_currency_data(self, pair, period):# Load data
-        df = pd.read_csv(btc_historic_data, sep=",")[["Unix","Open","High","Low","Close"]] #"volume"
-        df = ta.utils.dropna(df)
-        df.sort_values(by="Unix", inplace=True)
-        df["Date"]=pd.to_datetime(df["Unix"], unit='ms', errors='coerce')
-        return df
-        # return yf.Ticker(pair).history(period=period)[map(str.title, ['open', 'close', 'low', 'high', 'volume'])]
+def macd_strategy(df, risk):
+    MACD_Buy=[]
+    MACD_Sell=[]
+    position=False
 
-    # def calculate_MACD(self):
-    #     return self.df.ta.macd(close='close', fast=12, slow=26, append=True)
-    
-    # def get_historgram_colorized(self, df: DataFrame):
-    #     return np.where(df[self.macdh_config] < 0, '#000', self.colour_positive)
-    
-    # def get_layout():
-    #     return go.Layout(
-    #         plot_bgcolor='#efefef',
-    #         font_family='Monospace',
-    #         font_color='#000000',
-    #         font_size=20,
-    #         xaxis=dict(
-    #             rangeslider=dict(
-    #                 visible=False
-    #             )
-    #         )
-    #     )
-    
-    # def get_scatter(self, name, color, y, width, legendgroup):
-    #     return go.Scatter(
-    #             x=self.macd.index,
-    #             y=y,
-    #             line=dict(color=color, width=width),
-    #             legendgroup=legendgroup,
-    #             name=name
-    #         )
-    
-    # def get_candlesticks(self):
-    #     return go.Candlestick(
-    #             x=self.macd.index,
-    #             open=self.macd['open'],
-    #             high=self.macd['high'],
-    #             low=self.macd['low'],
-    #             close=self.macd['close'],
-    #             increasing_line_color=self.colour_positive,
-    #             decreasing_line_color='black',
-    #             showlegend=False
-    #         )
-    
-    # def price_line(self):
-    #     return self.get_scatter('open', self.colour_positive, self.macd['open'], 1, '1')
-    
-    # def fast_signal(self):
-    #     # return self.get_scatter('Fast Signal (k)', self.colour_positive, self.macd["macds_12_26_9"], 2, '2')
-    #     return self.get_scatter('Fast Signal (k)', '#ff9900', self.macd['macds_12_26_9'], 2, '2')
-    
-    # def slow_signal(self):
-    #     return self.get_scatter('Slow signal (d)', '#000000', self.macd["macdh_12_26_9"], 2, '2')
-    
-    # def get_histogram(self):
-    #     return go.Bar(
-    #             x=self.macd.index,
-    #             y=self.macd[self.macdh_config],
-    #             name='histogram',
-    #             marker_color=self.get_historgram_colorized(self.macd),
-    #         )
+    for (index, row), ii in zip(df.iterrows(), range(len(df.index))):
+        if row['MACD_12_26_9'] > row['MACDs_12_26_9']:
+            MACD_Sell.append(np.nan)
+            if position ==False:
+                MACD_Buy.append(row['Adj Close'])
+                position=True
+            else:
+                MACD_Buy.append(np.nan)
+        elif row['MACD_12_26_9'] < row['MACDs_12_26_9']:
+            MACD_Buy.append(np.nan)
+            if position == True:
+                MACD_Sell.append(row['Adj Close'])
+                position=False
+            else:
+                MACD_Sell.append(np.nan)
+        elif position == True and row['Adj Close'] < MACD_Buy[-1] * (1 - risk):
+            MACD_Sell.append(row['Adj Close'])
+            MACD_Buy.append(np.nan)
+            position = False
+        elif position == True and row['Adj Close'] < df.iloc[ii-1]['Adj Close'] * (1 - risk):
+            MACD_Sell.append(row['Adj Close'])
+            MACD_Buy.append(np.nan)
+            position = False
+        else:
+            MACD_Buy.append(np.nan)
+            MACD_Sell.append(np.nan)
 
-    # def macd_data(self):
-    #     macd_data=dict()
-    #     macd_data["macd"]=self.macd.to_json(orient ='records') 
-    #     macd_data["price_line"]=self.price_line()
-    #     macd_data["fast_signal"]=self.fast_signal()
-    #     macd_data["slow_signal"]=self.slow_signal()
-    #     macd_data["histogram"]=self.get_histogram()
-    #     return macd_data
+    df['MACD_Buy_Signal_price'] = MACD_Buy
+    df['MACD_Sell_Signal_price'] = MACD_Sell
+    df['positive'] = macd_color(df)
+    return df
 
-    # def create_fig(self):
-    #     fig = make_subplots(rows=2, cols=1)
-    #     fig.append_trace(self.price_line(), row=1, col=1)
-    #     fig.append_trace(self.get_candlesticks(), row=1, col=1)
-    #     fig.append_trace(self.fast_signal(), row=2, col=1)
-    #     # fig.append_trace(self.slow_signal(), row=2, col=1)
-    #     # fig.append_trace(self.get_histogram(), row=2, col=1)
-    #     # fig.update_layout(self.get_layout())
-    #     fig.show()
+# print("\n\n"+macd_obj.macd.to_json(orient='table'))
+# print("\n\n"+macd_obj.macd.to_json(orient ='records'))
+# print(f"\n\n")
+# print(macd_obj.df)
+# print(f"\n\n")
+# print(macd_obj.macd)
+
+# print(f"\n\n{macd_obj.macdh_config}")
+# print(f"\n\n{macd_obj.macds_config}")
+
+# macd_obj.create_fig()
+
+# window = 12
+# df[f"roc_{window}"] = momentum.ROCIndicator(close=df["Close"], window=window).roc()
+
+# # Create your own Custom Strategy
+# CustomStrategy = ta.Strategy(
+#     name="Momo and Volatility",
+#     description="SMA 50,200, BBANDS, RSI, MACD and Volume SMA 20",
+#     ta=[
+#         {"kind": "sma", "length": 50},
+#         {"kind": "sma", "length": 200},
+#         {"kind": "bbands", "length": 20},
+#         {"kind": "rsi"},
+#         {"kind": "macd", "fast": 8, "slow": 21},
+#         {"kind": "sma", "close": "volume", "length": 20, "prefix": "VOLUME"},
+#     ]
+# )
+# # To run your "Custom Strategy"
+# df.ta.strategy(CustomStrategy)

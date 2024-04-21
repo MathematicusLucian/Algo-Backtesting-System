@@ -14,11 +14,14 @@ import pathlib
 import os
 import pandas as pd
 from dotenv import main
+main.load_dotenv(main.find_dotenv())
 
 # CWD_DIR = os.getcwd()
 # BASE_DIR = os.path.abspath(os.path.join(CWD_DIR, 'src'))
 # load_dotenv(dotenv_path=os.path.join(BASE_DIR, ".env"))
-main.load_dotenv(main.find_dotenv())
+
+def retrieve_chained_header_item(df, first_key, second_key):
+    return df[:, (first_key, second_key)]
 
 def is_arg(arg_str: str) -> bool:
     for i, arg in enumerate(sys.argv):

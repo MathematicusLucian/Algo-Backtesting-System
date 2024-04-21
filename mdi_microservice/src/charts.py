@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import pandas_ta as ta
 from ta import momentum
-from src.services.strategy.macd import MACD
+from src.services.strategy._old_macd import MACD
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from pandas_datareader import data as pdr
@@ -62,7 +62,28 @@ def sma_chart(pair_key, data, start_date, end_date):
     ax.set_title(pair_key + " Price History with buy and sell signals",fontsize=10, backgroundcolor='blue', color='white')
     ax.set_xlabel(f'{start_date} - {end_date}' ,fontsize=18)
     ax.set_ylabel('Close Price INR (₨)' , fontsize=18)
-    legend = ax.legend()
+    ax.legend()
     ax.grid()
     plt.tight_layout()
+    plt.show()
+
+def macd_charts(pair_key, data):
+    plt.rcParams.update({'font.size': 10})
+    fig, ax1 = plt.subplots(figsize=(14,8))
+    fig.suptitle(pair_key, fontsize=10, backgroundcolor='blue', color='white')
+    ax1 = plt.subplot2grid((14, 8), (0, 0), rowspan=8, colspan=14)
+    ax2 = plt.subplot2grid((14, 12), (10, 0), rowspan=6, colspan=14)
+    ax1.set_ylabel('Price in ₨')
+    ax1.plot('Adj Close',data=data, label='Close Price', linewidth=0.5, color='blue')
+    ax1.scatter(data.index, data['MACD_Buy_Signal_price'], color='green', marker='^', alpha=1)
+    ax1.scatter(data.index, data['MACD_Sell_Signal_price'], color='red', marker='v', alpha=1)
+    ax1.legend()
+    ax1.grid()
+    ax1.set_xlabel('Date', fontsize=8)
+    ax2.set_ylabel('MACD', fontsize=8)
+    ax2.plot('MACD_12_26_9', data=data, label='MACD', linewidth=0.5, color='blue')
+    ax2.plot('MACDs_12_26_9', data=data, label='signal', linewidth=0.5, color='red')
+    ax2.bar(data.index,'MACDh_12_26_9', data=data, label='Volume', color=data.positive.map({True: 'g', False: 'r'}),width=1,alpha=0.8)
+    ax2.axhline(0, color='black', linewidth=0.5, alpha=0.5)
+    ax2.grid()
     plt.show()
