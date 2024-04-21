@@ -21,6 +21,14 @@ def get_history(stocks, start=date(2017,8,4), end=date.today()):
     # df.to_csv('df_history.csv', sep=',', index=False, encoding='utf-8')
     return df
 
+def get_stock_pairs(df_history, stock_pairs_keys):
+    stock_pairs_dict = dict()
+    for pair in stock_pairs_keys:
+        pair_history: pd.DataFrame = get_pair_history(df_history, pair)
+        # pair_history.to_csv(f'pair-{pair}.csv', sep=',', index=False, encoding='utf-8')
+        stock_pairs_dict[pair] = pair_history
+    return stock_pairs_dict
+
 def get_pair_history(df_history: pd.DataFrame, pair: str):
     pair_history: pd.DataFrame = pd.DataFrame()
     for col_name in df_history.columns:
@@ -78,7 +86,18 @@ def show_chart():
     )])
     fig.show()
 
-def buy_sell(df: pd.DataFrame):
+def sma_strategy(stock_pairs_dict, signals, days_collection):
+    index = 0
+    for pair_name in stock_pairs_dict:
+        index = index + 1
+        data = stock_pairs_dict[pair_name]
+        # stock_pairs_dict[pair_name].to_csv(f'sma-{index}.csv', sep=',', index=False, encoding='utf-8')
+        for days in days_collection:
+            data[f'SMA {days}'] = simple_moving_average(data, days)
+        data[f'SMA {signals[0]}'], data[f'SMA {signals[1]}'] = sma_strategy_buy_sell(data)
+        data.to_csv(f'strategy-output-{pair_name}.csv', sep=',', index=False, encoding='utf-8')
+
+def sma_strategy_buy_sell(df: pd.DataFrame):
     signalBuy = []
     signalSell = []
     position = False 
@@ -105,7 +124,7 @@ def buy_sell(df: pd.DataFrame):
             signalSell.append(np.nan)
     return pd.Series([signalBuy, signalSell])
 
-def sma_chart(pair_key, pair):
+def sma_chart(pair_key, data):
     fig, ax = plt.subplots(figsize=(14,8))
     ax.plot(data['Adj Close'], label = pair_key ,linewidth=0.5, color='blue', alpha = 0.9)
     ax.plot(data['SMA 30'], label = 'SMA30', alpha = 0.85)
@@ -133,22 +152,9 @@ start_date = date(2017,8,4)
 end_date = date.today()
 
 df_history = get_history(stock_pairs_keys, start_date, end_date)
+stock_pairs_dict = get_stock_pairs(df_history, stock_pairs_keys)
 
-stock_pairs_dict = dict()
-for pair in stock_pairs_keys:
-    pair_history: pd.DataFrame = get_pair_history(df_history, pair)
-    # pair_history.to_csv(f'pair-{pair}.csv', sep=',', index=False, encoding='utf-8')
-    stock_pairs_dict[pair] = pair_history
-
-index = 0
-for pair_name in stock_pairs_dict:
-    index = index + 1
-    data = stock_pairs_dict[pair_name]
-    # stock_pairs_dict[pair_name].to_csv(f'sma-{index}.csv', sep=',', index=False, encoding='utf-8')
-    for days in days_collection:
-        data[f'SMA {days}'] = simple_moving_average(data, days)
-    data[f'SMA {signals[0]}'], data[f'SMA {signals[1]}'] = buy_sell(data)
-    data.to_csv(f'strategy-output-{pair_name}.csv', sep=',', index=False, encoding='utf-8')
+sma_strategy(stock_pairs_dict, signals, days_collection)
 
 pair_key = 'BTC-GBP'
 pair = stock_pairs_dict[pair_key]
