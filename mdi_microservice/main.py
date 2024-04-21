@@ -14,15 +14,30 @@ signal=9
 ta_sample_data = "./src/services/strategy/datas.csv"
 btc_historic_data = "./src/services/strategy/Binance_BTCGBP_d.csv"
 
+def append_rsi_to_df(df: pd.DataFrame):
+    # df["RSI"]=ta.rsi(close=df.Close,length=10)
+    df.ta.rsi(length=100, append=True)
+    # plt.plot(df.Date, df.RSI)
+
+def append_sma_to_df(df: pd.DataFrame):
+    # df["SMA"]=ta.rsi(close=df.Close,length=10)
+    df.ta.sma(length=100, append=True)
+    # plt.plot(df.Date, df.SMA)
+
+def plot(df: pd.DataFrame, indicator: str):
+    if indicator == "rsi":
+        plt.plot(df.Date, df.RSI_100)
+    elif indicator == "sma":
+        plt.plot(df.Date, df.SMA_100)
+
 macd_obj = MACD(base, second_currency, period, fast, slow, signal)
 df = macd_obj.df
-
-# df["RSI"]=ta.rsi(close=df.Close,length=10)
-df["RSI"]=ta.rsi(close=df.Close, length=10, append=True)
-
 # print(df)
-
-plt.plot(df.Date, df.RSI)
+plt.plot(df.Date, df.Close)
+append_rsi_to_df(df)
+plot(df, "rsi")
+append_sma_to_df(df)
+plot(df, "sma")
 plt.show()
 
 # print("\n\n"+macd_obj.macd.to_json(orient='table'))
