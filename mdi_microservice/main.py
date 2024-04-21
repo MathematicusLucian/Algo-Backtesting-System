@@ -11,27 +11,14 @@ import yfinance as yfin
 yfin.pdr_override()
 plt.style.use('fivethirtyeight')
 
-base="USD"
-second_currency="BTC"
-period="1yr"
-fast=12
-slow=26
-signal=9
-ta_sample_data = "./src/services/strategy/datas.csv"
-btc_historic_data = "./src/services/strategy/Binance_BTCGBP_d.csv"
-stocksymbols = "TSLA"
-startdate = date(2017,8,4)
-end_date = date.today()
-
 def retrieve_chained_header_item(df, first_key, second_key):
     return df[:, (first_key, second_key)]
 
-def get_history(stocks=stocksymbols, start=startdate, end=end_date):
-    # start=datetime.datetime(2018, 1, 1), end=datetime.datetime(2020, 12, 2)
-    df: pd.DataFrame = pdr.get_data_yahoo(stocks, start=start, end=end) #['Close']
-    df["Date"]= pd.to_datetime(df.index) # Redundant - values in correct format
+def get_history(stocks, start=date(2017,8,4), end=date.today()):
+    df: pd.DataFrame = pdr.get_data_yahoo(stocks, start=start, end=end) 
+    df["Date"]= pd.to_datetime(df.index) 
     df.set_index('Date', inplace=True)
-    df.to_csv('df_history.csv', sep=',', index=False, encoding='utf-8')
+    # df.to_csv('df_history.csv', sep=',', index=False, encoding='utf-8')
     return df
 
 def get_pair_history(df_history: pd.DataFrame, pair: str):
@@ -39,7 +26,9 @@ def get_pair_history(df_history: pd.DataFrame, pair: str):
     for col_name in df_history.columns:
         if pair in col_name:
             pair_history[col_name[0]] = df_history[col_name]
-    pair_history.to_csv('pair_history.csv', sep=',', index=False, encoding='utf-8')
+    pair_history = pair_history.dropna()
+    pair_history.sort_values(by="Date", inplace=True)
+    # pair_history.to_csv(f'pair_history_{pair}.csv', sep=',', index=False, encoding='utf-8')
     return pair_history
 
 def relative_strength_index(df: pd.DataFrame, days):
@@ -116,25 +105,54 @@ def buy_sell(df: pd.DataFrame):
             signalSell.append(np.nan)
     return pd.Series([signalBuy, signalSell])
 
-stock_pairs = ['BTC-GBP', 'ETH-GBP', 'SOL-GBP']
+def sma_chart(pair_key, pair):
+    fig, ax = plt.subplots(figsize=(14,8))
+    ax.plot(data['Adj Close'], label = pair_key ,linewidth=0.5, color='blue', alpha = 0.9)
+    ax.plot(data['SMA 30'], label = 'SMA30', alpha = 0.85)
+    ax.plot(data['SMA 100'], label = 'SMA100' , alpha = 0.85)
+    ax.scatter(data.index, data['SMA Buy_Signal_price'], label='Buy', marker='^', color='green', alpha=1 )
+    ax.scatter(data.index, data['SMA Sell_Signal_price'], label='Sell', marker='v', color='red', alpha=1 )
+    ax.set_title(pair_key + " Price History with buy and sell signals",fontsize=10, backgroundcolor='blue', color='white')
+    ax.set_xlabel(f'{start_date} - {end_date}' ,fontsize=18)
+    ax.set_ylabel('Close Price INR (₨)' , fontsize=18)
+    legend = ax.legend()
+    ax.grid()
+    plt.tight_layout()
+    plt.show()
+
+stock_pairs_keys = ['BTC-GBP', 'ETH-GBP', 'SOL-GBP']
 signals = ['Buy_Signal_price', 'Sell_Signal_price']
 days_collection = [30, 100]
+base="USD"
+second_currency="BTC"
+period="1yr"
+fast=12
+slow=26
+signal=9
+start_date = date(2017,8,4)
+end_date = date.today()
 
-df_history = get_history(stock_pairs)
+df_history = get_history(stock_pairs_keys, start_date, end_date)
 
-for pair in stock_pairs:
+stock_pairs_dict = dict()
+for pair in stock_pairs_keys:
     pair_history: pd.DataFrame = get_pair_history(df_history, pair)
+    # pair_history.to_csv(f'pair-{pair}.csv', sep=',', index=False, encoding='utf-8')
+    stock_pairs_dict[pair] = pair_history
+
+index = 0
+for pair_name in stock_pairs_dict:
+    index = index + 1
+    data = stock_pairs_dict[pair_name]
+    # stock_pairs_dict[pair_name].to_csv(f'sma-{index}.csv', sep=',', index=False, encoding='utf-8')
     for days in days_collection:
-        pair_history[f'SMA {days}'] = simple_moving_average(pair_history, days)
-    pair_history[f'SMA {signals[0]}'], pair_history[f'SMA {signals[1]}'] = buy_sell(pair_history)
+        data[f'SMA {days}'] = simple_moving_average(data, days)
+    data[f'SMA {signals[0]}'], data[f'SMA {signals[1]}'] = buy_sell(data)
+    data.to_csv(f'strategy-output-{pair_name}.csv', sep=',', index=False, encoding='utf-8')
 
-    print(pair_history)
-
-
-
-
-
-
+pair_key = 'BTC-GBP'
+pair = stock_pairs_dict[pair_key]
+sma_chart(pair_key, pair)
 
 
 
