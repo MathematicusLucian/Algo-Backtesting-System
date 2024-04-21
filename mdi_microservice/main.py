@@ -43,12 +43,20 @@ def create_plot_graph(df: pd.DataFrame):
 macd_obj = MACD(base, second_currency, period, fast, slow, signal)
 df = macd_obj.df
 # print(df)
-fig = go.Figure(data=[go.Candlestick(
-    x=df.Date,
-    open=df.Open,
+hadf=ta.ha(
+    open_=df.Open,
     high=df.High,
     low=df.Low,
     close=df.Close
+)
+fig = go.Figure(data=[go.Candlestick(
+    x=df.Date,
+    open=hadf.HA_open,
+    high=hadf.HA_high,
+    low=hadf.HA_low,
+    close=hadf.HA_close,
+    increasing_line_color="green",
+    decreasing_line_color="red",
 )])
 fig.show()
 
