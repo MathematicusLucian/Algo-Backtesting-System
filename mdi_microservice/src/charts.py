@@ -87,3 +87,23 @@ def macd_charts(pair_key, data):
     ax2.axhline(0, color='black', linewidth=0.5, alpha=0.5)
     ax2.grid()
     plt.show()
+
+def bollinger_chart(pair_key, data):
+    fig, ax1 = plt.subplots(figsize=(14,8))
+    fig.suptitle(pair_key, fontsize=10, backgroundcolor='blue', color='white')
+    ax1 = plt.subplot2grid((14, 8), (0, 0), rowspan=8, colspan=14)
+    ax2 = plt.subplot2grid((14, 12), (10, 0), rowspan=6, colspan=14)
+    ax1.set_ylabel('Price in ₨')
+    ax1.plot(data['Adj Close'],label='Close Price', linewidth=0.5, color='blue')
+    ax1.scatter(data.index, data['bb_Buy_Signal_price'], color='green', marker='^', alpha=1)
+    ax1.scatter(data.index, data['bb_Sell_Signal_price'], color='red', marker='v', alpha=1)
+    ax1.legend()
+    ax1.grid()
+    ax1.set_xlabel('Date', fontsize=8)
+    ax2.plot(data['BBM_20_2.0'], label='Middle', color='blue', alpha=0.35) #middle band
+    ax2.plot(data['BBU_20_2.0'], label='Upper', color='green', alpha=0.35) #Upper band
+    ax2.plot(data['BBL_20_2.0'], label='Lower', color='red', alpha=0.35) #lower band
+    ax2.fill_between(data.index, data['BBL_20_2.0'], data['BBU_20_2.0'], alpha=0.1)
+    ax2.legend(loc='upper left')
+    ax2.grid()
+    plt.show()

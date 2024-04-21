@@ -11,6 +11,7 @@ yfin.pdr_override()
 plt.style.use('fivethirtyeight')
 from src.charts import *
 # from src.services.strategy._old_macd import MACD
+from src.services.strategy.bollinger import *
 from src.services.strategy.macd import *
 from src.services.strategy.rsi import *
 from src.services.strategy.sma import *
@@ -37,7 +38,11 @@ pair_data = stock_pairs_dict[pair_key]
 # sma_chart(pair_key, pair_data, start_date, end_date)
 
 # --- MACD ---
-df_macd: pd.DataFrame = calculate_macd(pair_data)
-pair_data = pd.concat([pair_data, df_macd], axis=1).reindex(pair_data.index)
+pair_data: pd.DataFrame = calculate_macd(pair_data)
 df_macd_strategy_outcome = macd_strategy(pair_data, 0.025)
-macd_charts(pair_key, df_macd_strategy_outcome)
+# macd_charts(pair_key, df_macd_strategy_outcome)
+
+# --- Bollinger ---
+pair_data = calculate_bollinger(df_macd_strategy_outcome)
+df_bollinger_strategy_outcome = bollinger_strategy(pair_data)
+bollinger_chart(pair_key, df_bollinger_strategy_outcome)

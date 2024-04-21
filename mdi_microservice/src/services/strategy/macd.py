@@ -11,7 +11,8 @@ import yfinance as yfin
 yfin.pdr_override()
 
 def calculate_macd(df) -> pd.DataFrame:
-    return ta.macd(df['Close'])
+    df_macd = ta.macd(df['Close'])
+    return pd.concat([df, df_macd], axis=1).reindex(df.index)
 
 def macd_color(df):
     macd_color = []
