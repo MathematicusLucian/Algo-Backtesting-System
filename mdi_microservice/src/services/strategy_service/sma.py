@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import pandas_ta as ta
 from ta import momentum
-from src.services.strategy._old_macd import MACD
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from pandas_datareader import data as pdr
@@ -22,7 +21,7 @@ def sma_strategy(stock_pairs_dict, signals, days_collection):
         for days in days_collection:
             data[f'SMA {days}'] = simple_moving_average(data, days)
         data[f'SMA {signals[0]}'], data[f'SMA {signals[1]}'] = sma_strategy_buy_sell(data)
-        data.to_csv(f'strategy-output-{pair_name}.csv', sep=',', index=False, encoding='utf-8')
+        # data.to_csv(f'strategy-output-{pair_name}.csv', sep=',', index=False, encoding='utf-8')
 
 def sma_strategy_buy_sell(df: pd.DataFrame):
     signalBuy = []

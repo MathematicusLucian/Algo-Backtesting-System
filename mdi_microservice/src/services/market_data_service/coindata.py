@@ -1,6 +1,6 @@
 from livecoinwatch import LiveCoinWatch
 from datetime import datetime, timedelta
-from src.services.base import BaseService
+from src.services.market_data_service.base import BaseService
 
 class CoinDataService(BaseService):
 

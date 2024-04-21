@@ -27,8 +27,7 @@ from okx.MarketData import MarketAPI
 from okx.PublicData import PublicAPI
 import requests
 # from src.services.market_data_service.WssMarketDataService import ChecksumThread, WssMarketDataService
-from src.services.metals_data_service.gold_prices import fetch_gold_price
-from src.services.strategy._old_macd import *
+from src.services.market_data_service.gold_prices import fetch_gold_price
 # from src.services.sentiment_service import XSentimentService
 # from src.services.x_service import XArchive, x_unofficial
 # from src.services.crypto_analysis import *

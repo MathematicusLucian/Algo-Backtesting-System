@@ -5,7 +5,6 @@ import pandas as pd
 from ta import momentum
 import pandas_ta as pta
 from finta import TA
-from src.services.strategy._old_macd import MACD
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from pandas_datareader import data as pdr
