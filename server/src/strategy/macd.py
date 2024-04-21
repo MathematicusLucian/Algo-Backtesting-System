@@ -6,8 +6,10 @@ from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 
 class MACD:
-    def __init__(self, fast=12, slow=26, signal=9):
-        self.df:DataFrame=self.get_currency_data('BTC-USD', '1y')
+    def __init__(self, pair, period, fast=12, slow=26, signal=9):
+        self.colour_negative = '#006A4E'
+        self.colour_positive = '#8e1600'
+        self.df:DataFrame=self.get_currency_data(pair, period)
         self.macd:DataFrame
         self.fast=fast
         self.slow=slow
@@ -33,7 +35,7 @@ class MACD:
         self.macd.columns = [x.lower() for x in self.macd.columns]
     
     def get_historgram_colorized(self, df: DataFrame):
-        return np.where(df[self.macdh_config] < 0, '#000', '#ff9900')
+        return np.where(df[self.macdh_config] < 0, '#000', self.colour_positive)
     
     def get_layout():
         return go.Layout(
@@ -64,16 +66,16 @@ class MACD:
                 high=self.macd['high'],
                 low=self.macd['low'],
                 close=self.macd['close'],
-                increasing_line_color='#ff9900',
+                increasing_line_color=self.colour_positive,
                 decreasing_line_color='black',
                 showlegend=False
             )
     
     def price_line(self):
-        return self.get_scatter('open', '#ff9900', self.macd['open'], 1, '1')
+        return self.get_scatter('open', self.colour_positive, self.macd['open'], 1, '1')
     
     def fast_signal(self):
-        return self.get_scatter('Fast Signal (k)', '#ff9900', self.macd[self.macds_config], 2, '2')
+        return self.get_scatter('Fast Signal (k)', self.colour_positive, self.macd[self.macds_config], 2, '2')
     
     def slow_signal(self):
         return self.get_scatter('Slow signal (d)', '#000000', self.macd[self.macds_config], 2, '2')

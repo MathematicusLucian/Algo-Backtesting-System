@@ -25,7 +25,7 @@ from okx.MarketData import MarketAPI
 from okx.PublicData import PublicAPI
 # from src.services.market_data_service.WssMarketDataService import ChecksumThread, WssMarketDataService
 from src.services.metals_data_service.gold_prices import fetch_gold_price
-from src.strategy.macd import determine_macd_crypto
+from src.strategy.macd import *
 # from src.services.sentiment_service import XSentimentService
 # from src.services.x_service import XArchive, x_unofficial
 # from src.services.crypto_analysis import *
@@ -106,7 +106,11 @@ def fetch_audusd15m_():
 # --------------------
 @route.route('/api/macd_crypto/', methods=['GET'])
 def macd_crypto():
-    return determine_macd_crypto()
+    fast=12
+    slow=26
+    signal=9
+    macd = MACD('BTC-USD', '1y', fast, slow, signal)
+    return macd.macd_data()
 
 # /// CRYPTO DATA ///
 
