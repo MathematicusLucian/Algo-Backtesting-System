@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from email.mime import base
 import os
 from markupsafe import escape
 import json
@@ -20,12 +21,14 @@ from flask import abort, app, Blueprint, jsonify, redirect, render_template, req
 # from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 # import seaborn as sns
 # import logging
+from okx.Convert import ConvertAPI
 from okx.exceptions import OkxAPIException, OkxParamsException, OkxRequestException
 from okx.MarketData import MarketAPI
 from okx.PublicData import PublicAPI
+import requests
 # from src.services.market_data_service.WssMarketDataService import ChecksumThread, WssMarketDataService
 from src.services.metals_data_service.gold_prices import fetch_gold_price
-from src.strategy.macd import *
+from src.services.strategy.macd import *
 # from src.services.sentiment_service import XSentimentService
 # from src.services.x_service import XArchive, x_unofficial
 # from src.services.crypto_analysis import *
@@ -34,6 +37,7 @@ from src.strategy.macd import *
 # from src.utils import chart_colors
 from src.utils.common import get_config
 from src.services.coindata import CoinDataService
+from okx import consts as okx_consts
 
 api_key = get_config('LIVECOINWATCH_API_KEY')
 base_currency = get_config('BASE_CURRENCY')
@@ -47,6 +51,8 @@ def create_okx_api(api, is_paper_trading):
         return MarketAPI(flag, debug=False)
     elif api=="PublicAPI":
         return PublicAPI(flag, debug=False)
+    elif api=="ConvertAPI":
+        return ConvertAPI(flag, debug=False)
 
 # @route.errorhandler(404)
 # def not_found():
@@ -105,13 +111,14 @@ def fetch_audusd15m_():
 @route.route("/api/macd") #, methods=['GET'])
 def macd():
     base = request.args.get('base')
-    second_currency = request.args.get('second_currency')
-    period = request.args.get('period')
-    fast=12
-    slow=26
-    signal=9
-    macd = MACD(base, second_currency, period, fast, slow, signal)
-    resp = jsonify(macd.macd_data())
+    # second_currency = request.args.get('second_currency')
+    # period = request.args.get('period')
+    # fast=12
+    # slow=26
+    # signal=9
+    # macd = MACD(base, second_currency, period, fast, slow, signal)
+    # resp = jsonify(macd.macd_data())
+    resp=jsonify(base)
     return resp
 
 # /// CRYPTO DATA ///
@@ -119,12 +126,51 @@ def macd():
 # --------------------
 # --- COIN VALUES ----
 # --------------------
+
+# Latest Kreken prices
+# https://api.coingecko.com/api/v3/exchanges/kraken
+
+# /api/currencies?base=gbp&second_currency=bitcoin
+# https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=gbp
+# Fetch prices for several currencies at once:
+# https://api.coingecko.com/api/v3/simple/price?ids=ethereum,bitcoin&vs_currencies=gbp
+@route.route("/api/latest")
+def latest():
+    base = request.args.get('base')
+    if isinstance(base, list):
+        base = ','.join(map(str, base)) 
+    second_currency = request.args.get('second_currency')
+    r = requests.get(f'https://api.coingecko.com/api/v3/simple/price?ids={second_currency}&vs_currencies={base}')
+    return r
+
 # /api/currencies?selected=GBP
 @route.route("/api/currencies")
 def currencies():
     selected_currency = request.args.get('selected') if request.args.get('selected') else None
     currencies = coin_data.get_currencies(selected_currency)
     return jsonify({"res": currencies})
+
+@route.route("/api/price_history")
+def price_history():# https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?&vs_currency=btc&days=100
+    base = request.args.get('base')
+    second_currency = request.args.get('second_currency')
+    r = requests.get(f'https://api.coingecko.com/api/v3/simple/price?ids={second_currency}&vs_currencies={base}')
+    return r
+
+# https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?&vs_currency=btc&days=100
+@route.route("/api/market_chart")
+def market_chart():
+    base = request.args.get('base')
+    # second_currency = request.args.get('second_currency')
+    days = 100
+    r = requests.get(f'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?&vs_currency={base}&days={days}')
+    return r
+
+@route.route('/api/currencies_2/<base_curr>/<symbol>/', methods=['GET'])
+async def currencies_2(base_curr, symbol):
+    okx_api = create_okx_api("ConvertAPI", is_paper_trading=True)
+    instrID = f"{base_curr}-{symbol}"
+    return jsonify(okx_api.get_currencies(instrID))
 
 # /api/currencies?base=GBP&second_currency=BTC
 @route.route("/api/coin_history")
@@ -134,6 +180,18 @@ def historic_values__coin():
     period = request.args.get('period')
     return coin_data.get_historic_values__coin(second_currency, base, period)
 
+@route.route("/api/pair_history")
+def pair_history():
+    base_curr = request.args.get('base')
+    symbol = request.args.get('second_currency')
+    period = request.args.get('period')
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=True)
+    instrID = f"{base_curr}-{symbol}"
+    params = {'chainId': 1, 'limit': 5, 'after': 1700040600000, 'period': '5m'}
+    HISTORY_PAIR = '/api/v5/waas/coin/historical-price'
+    data = okx_api._request_with_params(okx_consts.GET, HISTORY_PAIR, params)
+    return jsonify(data)
+
 @route.route("/api/coins_history")
 def historic_values__coins():
     return coin_data.get_historic_values__coins(coins)
@@ -142,6 +200,24 @@ def historic_values__coins():
 def latest_values():
     return coin_data.get_latest_values(coins)
 
+@route.route('/api/currency_pair/<base_curr>/<symbol>/', methods=['GET'])
+async def currency_pair(base_curr, symbol):
+    okx_api = create_okx_api("ConvertAPI", is_paper_trading=True)
+    instrID = f"{base_curr}-{symbol}"
+    fromCcy=''
+    toCcy=''
+    return jsonify(okx_api.get_currency_pair(instrID, fromCcy, toCcy))
+
+@route.route('/api/convert_history/<base_curr>/<symbol>/', methods=['GET'])
+async def convert_history(base_curr, symbol):
+    okx_api = create_okx_api("ConvertAPI", is_paper_trading=True)
+    instrID = f"{base_curr}-{symbol}"
+    after = ''
+    before = ''
+    limit = ''
+    tag=''
+    return jsonify(okx_api.get_currency_pair(instrID, after, before, limit,tag))
+
 # --------------------
 # --- CANDLESTICKS ---
 # --------------------
@@ -149,7 +225,7 @@ def latest_values():
 # http://127.0.0.1:5000/historic_candlesticks__crypto_spot/ETH/USD/
 @route.route('/api/candlesticks__crypto_spot/<base_curr>/<symbol>/', methods=['GET'])
 async def candlesticks__crypto_spot(base_curr, symbol):
-    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=True)
     instrID = f"{base_curr}-{symbol}"
     return jsonify(okx_api.get_candlesticks(instrID))
 
@@ -157,13 +233,13 @@ async def candlesticks__crypto_spot(base_curr, symbol):
 # http://127.0.0.1:5000/historic_candlesticks__crypto_spot/ETH/USD/
 @route.route('/api/historic_candlesticks__crypto_spot/<base_curr>/<symbol>/', methods=['GET'])
 async def historic_candlesticks__crypto_spot(base_curr, symbol):
-    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=True)
     instrID = f"{base_curr}-{symbol}"
     return jsonify(okx_api.get_index_candlesticks(instrID))
 
 @route.route('/api/historic_candlesticks__crypto_mark_price/<base_curr>/<symbol>/', methods=['GET'])
 async def historic_candlesticks__crypto_mark_price(base_curr, symbol):
-    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=True)
     instrID = f"{base_curr}-{symbol}"
     return jsonify(okx_api.get_mark_price_candlesticks(instrID))
 
@@ -172,7 +248,7 @@ async def historic_candlesticks__crypto_mark_price(base_curr, symbol):
 # https://www.okx.com/docs-v5/en/#public-data-rest-api-get-index-candlesticks
 @route.route('/api/historic_candlesticks__crypto_swap/<base_curr>/<symbol>/', methods=['GET'])
 async def historic_candlesticks__crypto_swap(base_curr, symbol):
-    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=True)
     instrID = f"{base_curr}-{symbol}-SWAP"
     return jsonify(okx_api.get_history_candlesticks(instrID))
 
@@ -181,7 +257,7 @@ async def historic_candlesticks__crypto_swap(base_curr, symbol):
 # --------------------
 @route.route('/api/index_components/<base_curr>/<symbol>/', methods=['GET'])
 async def index_components__crypto(base_curr, symbol):
-    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=True)
     instrID = f"{base_curr}-{symbol}"
     return jsonify(okx_api.get_index_components(instrID))
 
@@ -190,7 +266,7 @@ async def index_components__crypto(base_curr, symbol):
 # --------------------
 @route.route('/api/exchange_rate/', methods=['GET'])
 async def exchange_rate():
-    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=True)
     return jsonify(okx_api.get_exchange_rate())
 
 # --------------------
@@ -198,13 +274,13 @@ async def exchange_rate():
 # --------------------
 @route.route('/api/orderbook/<base_curr>/<symbol>/', methods=['GET'])
 async def orderbook(base_curr, symbol):
-    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=True)
     instrID = f"{base_curr}-{symbol}"
     return jsonify(okx_api.get_orderbook(instrID))
 
 @route.route('/api/orderbook_basic/<base_curr>/<symbol>/', methods=['GET'])
 async def orderbook_basic(base_curr, symbol):
-    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=True)
     instrID = f"{base_curr}-{symbol}"
     return jsonify(okx_api.get_order_lite_book(instrID))
 
@@ -213,7 +289,7 @@ async def orderbook_basic(base_curr, symbol):
 # --------------------
 @route.route('/api/index_tickers/<base_curr>/<symbol>/', methods=['GET'])
 async def index_tickers(base_curr, symbol):
-    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=True)
     instrID = f"{base_curr}-{symbol}"
     return jsonify(okx_api.get_index_tickers(instId=instrID))
 
@@ -222,13 +298,13 @@ async def index_tickers(base_curr, symbol):
 # --------------------
 @route.route('/api/trades/<base_curr>/<symbol>/', methods=['GET'])
 async def trades(base_curr, symbol):
-    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=True)
     instrID = f"{base_curr}-{symbol}"
     return jsonify(okx_api.get_trades(instrID))
 
 @route.route('/api/history_trades/<base_curr>/<symbol>/', methods=['GET'])
 async def history_trades(base_curr, symbol):
-    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=True)
     instrID = f"{base_curr}-{symbol}"
     return jsonify(okx_api.get_history_trades(instId=instrID))
 
@@ -237,7 +313,7 @@ async def history_trades(base_curr, symbol):
 # --------------------
 @route.route('/api/volume/', methods=['GET'])
 async def volume():
-    okx_api = create_okx_api("MarketAPI", is_paper_trading=False)
+    okx_api = create_okx_api("MarketAPI", is_paper_trading=True)
     return jsonify(okx_api.get_volume())
 
 # strategy = SampleMM()
