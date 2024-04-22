@@ -30,17 +30,17 @@ services:
     restart: always
     image: flask
     build: 
-      context: ./server
-      dockerfile: ../deployment/Dockerfile_server
+      context: ./mdi_microservice
+      dockerfile: ../deployment/Dockerfile_mdi_microservice
     volumes:
-     - ./server:/usr/src/app/server
+     - ./mdi_microservice:/usr/src/app/mdi_microservice
     env_file:
      - .env
     develop:
       watch:
         - action: sync
-          path: ./server
-          target: /usr/src/app/server
+          path: ./mdi_microservice
+          target: /usr/src/app/mdi_microservice
           ignore:
             - venv/
         - action: rebuild

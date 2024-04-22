@@ -6,19 +6,69 @@ This service imports my LiveCoinWatch library, which is an interface to the [Liv
 - GitHub: [github.com/MathematicusLucian/LiveCoinWatch](https://github.com/MathematicusLucian/LiveCoinWatch)
 - PyPi: [pypi.org/project/LiveCoinWatch/1.0.0/](https://pypi.org/project/LiveCoinWatch/1.0.0/)
 
+![Candlesticks chart](./assets/candlesticks.png)
+
+## Strategy
+
+### Bollinger Bands
+![Bollinger chart](./assets/bollinger.png)
+
+### Simple Moving Average (SMA)
+![SMA chart](./assets/sma.png)
+
+3 conditions:
+- 10-day SMA above 30-day SMA.
+- 10-day and 30-day SMA above 50-day SMA.
+- 10-day, 30-day, and 50-day above 200-day SMA.
+
+**Sample stategy**
+- 10-day SMA below 30-day SMA.
+- MACD value above MACD signal line.
+- MACD value above 0.
+- 10-day and 30-day SMA above 50-day SMA.
+- 10-day, 30-day, and 50-day SMA below 200-day SMA.
+
+### RSI
+
+-
+
+### The Moving Average Convergence/Divergence indicator
+![MACD chart](./assets/macd.png)
+
+Purpose: Entry/exit points; trend confirmation; and risk management.
+
+2 conditions:
+- MACD above the MACD signal.
+- MACD greater than 0.
+
+The MACD indicator is derived from two exponential moving averages (EMAs) — the 12-day EMA and the 26-day EMA. The formula for MACD is as follows:
+
+``MACDLine=12−dayEMA−26−dayEMA``
+
+A signal line, often a 9-day EMA, is plotted on top of the MACD line. This signal line serves as a trigger for buy or sell signals.
+
+``SignalLine=9−dayEMA``
+
+The MACD histogram, the visual representation of the difference between the MACD line and the signal line, provides insights into the strength and direction of the trend.
+
+``MACDHistogram=MACDLine−SignalLine``
+
 ## Architecture
 
 ### Docker
   - Docker Compose to build and host app: ```docker-compose.yml``` to create containers and run the app. Several versions, i.e. for different environments.
   - Reverse proxy (`nginx`) - web server, and reverse proxy. External user hits the nginx - distributes request to UI or 
 
-### Microservice (Python)
+### MDI (Market data and indicators) Microservice (Python)
 ***Flask*** app: including tests setup, configs and settings files, Dockerfile for running the Flask container, etc..
   - Flask - Back-End Python framework.
   - ```.env``` variable: Environment variables for Flask and SQLite3. Several versions, i.e. for different environments.
   - Optimised for large scale app structure, with `Blueprints`, `application factory` and several configs that can be extended from this seed project to any Prod-ready app.
   - uwsgi - WSGI server - direct support for popular NGINX web 
   - Flask code Testing.
+
+### Other Microservices
+Seperated to improve load time (thus if changes are made, not always need to reload whole back-end, or install to container dependencies of other microservices.) WIP: Sentiment scraping, sentiment analysis, LLM, etc..
 
 ### UI (TypeScript)
 ***Angular:*** Front-End JavaScript framework.
@@ -76,11 +126,6 @@ Prune Docker regularly:
 
 - ``docker system prune``
 - ``docker rmi $(docker images | awk '/^<none>/ {print $3}')``
-
-## Env
-- Create: ``python3 -m venv venv``
-- Active: ``source venv/bin/activate``
-- ***Requirements:***``pip freeze -r requirements.txt | sed '/freeze/,$ d'``
 
 ## APIs
 
