@@ -23,3 +23,8 @@ def calculate_ema(df) -> pd.DataFrame:
     df["ema12ltema26"] = df["ema12ltema26"].astype(int)
     df["ema12ltema26co"] = df["ema12ltema26co"].astype(int)
     return df
+
+def signals(df):
+    buysignals = df[df["ema12gtema26co"] == 1]
+    sellsignals = df[df["ema12ltema26co"] == 1]
+    return buysignals, sellsignals

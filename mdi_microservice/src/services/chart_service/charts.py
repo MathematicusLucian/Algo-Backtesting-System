@@ -5,10 +5,14 @@ import pandas_ta as ta
 from ta import momentum
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+import mplfinance as mpf
 from pandas_datareader import data as pdr
 import yfinance as yfin
 yfin.pdr_override()
 plt.style.use('fivethirtyeight')
+
+def candlesticks_chart(df):
+    mpf.plot(df.head(100),type='candle',style='yahoo',volume=True)
 
 def sma_chart(pair_key, data, start_date, end_date, days_collection):
     fig, ax = plt.subplots(figsize=(14,8))

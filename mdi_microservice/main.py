@@ -29,6 +29,9 @@ stock_pairs_dict = get_stock_pairs(df_history, stock_pairs_keys)
 pair_key = 'BTC-GBP'
 pair_data = stock_pairs_dict[pair_key]
 
+# --- Candlesticks ---
+candlesticks_chart(pair_data)
+
 # --- SMA ---
 sma.calculate_sma(stock_pairs_dict, signals, days_collection)
 sma_chart(pair_key, pair_data, start_date, end_date, days_collection)
