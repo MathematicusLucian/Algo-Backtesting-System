@@ -12,16 +12,16 @@ yfin.pdr_override()
 def calculate_sma__days(df: pd.DataFrame, days):
     return ta.sma(df['Close'], int(days))
 
-def calculate_sma(stock_pairs_dict, signals, days_collection):
-    index = 0
-    for pair_name in stock_pairs_dict:
-        index = index + 1
-        data = stock_pairs_dict[pair_name]
-        for days in days_collection:
-            data[f'SMA {days}'] = calculate_sma__days(data, days)
-        data[f'SMA {signals[0]}'], data[f'SMA {signals[1]}'] = sma_strategy_buy_sell(data)
-        # stock_pairs_dict[pair_name].to_csv(f'sma-{index}.csv', sep=',', index=False, encoding='utf-8')
-        # data.to_csv(f'strategy-output-{pair_name}.csv', sep=',', index=False, encoding='utf-8')
+def calculate_sma(data, days_collection):
+    for days in days_collection:
+        data[f'SMA {days}'] = calculate_sma__days(data, days)
+    # stock_pairs_dict[pair_name].to_csv(f'sma-{index}.csv', sep=',', index=False, encoding='utf-8')
+    # data.to_csv(f'strategy-output-{pair_name}.csv', sep=',', index=False, encoding='utf-8')
+    return data
+
+def sma_strategy(data, signals):
+    data[f'SMA {signals[0]}'], data[f'SMA {signals[1]}'] = sma_strategy_buy_sell(data)
+    return data
 
 def sma_strategy_buy_sell(df: pd.DataFrame):
     signalBuy = []

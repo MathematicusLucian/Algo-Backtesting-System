@@ -16,10 +16,11 @@ def candlesticks_chart(df):
 
 def sma_chart(pair_key, data, start_date, end_date, days_collection):
     fig, ax = plt.subplots(figsize=(14,8))
-    ax.plot(data['Adj Close'], label = pair_key ,linewidth=0.5, color='blue', alpha = 0.9)
+    ax.plot(data['Adj Close'], label = pair_key ,linewidth=0.6, color='blue', alpha = 0.9)
+    days_collection = [2, 5, 10]
     for days in days_collection:
         days_str = f'SMA {days}'
-        ax.plot(data[days_str], label=f'SMA{days}', alpha=0.85)
+        ax.plot(data[days_str], label=f'SMA{days}', alpha=0.2)
     ax.scatter(data.index, data['SMA Buy_Signal_price'], label='Buy', marker='^', color='green', alpha=1 )
     ax.scatter(data.index, data['SMA Sell_Signal_price'], label='Sell', marker='v', color='red', alpha=1 )
     ax.set_title(pair_key + " Price History with buy and sell signals",fontsize=10, backgroundcolor='blue', color='white')
