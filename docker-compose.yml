@@ -1,4 +1,4 @@
-version: '2'
+version: '1'
 
 services:
   crypto_tracker_nginx:
@@ -13,8 +13,12 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "444:444"
+      - "445:445"
     depends_on:
-      - crypto_tracker_flask
+      - mdi_ms_flask
+      # - sentiment_ms
+      - backtesting_ms_flask
     develop:
       watch: #https://docs.docker.com/compose/file-watch/ #docker compose watch
         - action: sync
@@ -25,22 +29,64 @@ services:
         - action: rebuild
           path: package.json
 
-  crypto_tracker_flask:
-    container_name: crypto_tracker_flask_container
+  mdi_ms_flask:
+    container_name: mdi_ms_flask_container
     restart: always
     image: flask
     build: 
-      context: ./mdi_microservice
-      dockerfile: ../deployment/Dockerfile_mdi_microservice
+      context: ./mdi_ms
+      dockerfile: ../deployment/Dockerfile_mdi_ms
     volumes:
-     - ./mdi_microservice:/usr/src/app/mdi_microservice
+     - ./mdi_ms:/usr/src/app/mdi_ms
     env_file:
      - .env
     develop:
       watch:
         - action: sync
-          path: ./mdi_microservice
-          target: /usr/src/app/mdi_microservice
+          path: ./mdi_ms
+          target: /usr/src/app/mdi_ms
+          ignore:
+            - venv/
+        - action: rebuild
+          path: requirements.txt
+
+  # sentiment_ms_flask:
+  #   container_name: sentiment_ms_flask_container
+  #   restart: always
+  #   image: flask
+  #   build: 
+  #     context: ./sentiment_ms
+  #     dockerfile: ../deployment/Dockerfile_sentiment_ms
+  #   volumes:
+  #    - ./sentiment_ms:/usr/src/app/sentiment_ms
+  #   env_file:
+  #    - .env
+  #   develop:
+  #     watch:
+  #       - action: sync
+  #         path: ./sentiment_ms
+  #         target: /usr/src/app/sentiment_ms
+  #         ignore:
+  #           - venv/
+  #       - action: rebuild
+  #         path: requirements.txt
+
+  backtesting_ms_flask:
+    container_name: backtesting_ms_flask_container
+    restart: always
+    image: flask
+    build: 
+      context: ./backtesting_ms
+      dockerfile: ../deployment/Dockerfile_backtesting_ms
+    volumes:
+     - ./backtesting_ms:/usr/src/app/backtesting_ms
+    env_file:
+     - .env
+    develop:
+      watch:
+        - action: sync
+          path: ./backtesting_ms
+          target: /usr/src/app/backtesting_ms
           ignore:
             - venv/
         - action: rebuild

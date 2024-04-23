@@ -16,15 +16,8 @@ This service imports my LiveCoinWatch library, which is an interface to the [Liv
 ### Simple Moving Average (SMA)
 ![SMA chart](./assets/sma.png)
 
-3 conditions:
-- 10-day SMA above 30-day SMA.
-- 10-day and 30-day SMA above 50-day SMA.
-- 10-day, 30-day, and 50-day above 200-day SMA.
-
 **Sample stategy**
 - 10-day SMA below 30-day SMA.
-- MACD value above MACD signal line.
-- MACD value above 0.
 - 10-day and 30-day SMA above 50-day SMA.
 - 10-day, 30-day, and 50-day SMA below 200-day SMA.
 
