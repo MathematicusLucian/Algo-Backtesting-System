@@ -29,7 +29,7 @@ def sma_strategy_buy_sell(df: pd.DataFrame):
     position = False 
 
     for index, row in df.iterrows():
-        if row['SMA 30'] > row['SMA 100']:
+        if (row['SMA 30'] > row['SMA 10']) and (row['SMA 10'] > row['SMA 50']) and (row['SMA 30'] > row['SMA 50']) and (row['SMA 200'] > row['SMA 10']) and (row['SMA 200'] > row['SMA 30']) and (row['SMA 200'] > row['SMA 50']):
             if position == False:
                 signalBuy.append(row['Adj Close'])
                 signalSell.append(np.nan)
@@ -37,7 +37,7 @@ def sma_strategy_buy_sell(df: pd.DataFrame):
             else:
                 signalBuy.append(np.nan)
                 signalSell.append(np.nan)
-        elif row['SMA 30'] < row['SMA 100']:
+        elif (row['SMA 30'] < row['SMA 10']) and (row['SMA 10'] < row['SMA 50']) and (row['SMA 30'] < row['SMA 50']) and (row['SMA 200'] < row['SMA 10']) and (row['SMA 200'] < row['SMA 30']) and (row['SMA 200'] < row['SMA 50']):
             if position == True:
                 signalBuy.append(np.nan)
                 signalSell.append(row['Adj Close'])
