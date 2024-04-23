@@ -8,6 +8,25 @@ import plotly.graph_objects as go
 from pandas_datareader import data as pdr
 import yfinance as yfin
 yfin.pdr_override()
+# https://kernc.github.io/backtesting.py/doc/backtesting/#gsc.tab=0
+from backtesting import Strategy
+from backtesting.lib import crossover
+from backtesting.test import SMA
+
+class SmaCross(Strategy):
+    def init(self, n1, n2):
+        super(SmaCross, self).__init__(self, n1, n2)
+        close = self.data.Close
+        self.n1 = n1
+        self.n2 = n2
+        self.sma1 = self.I(SMA, close, self.n1)
+        self.sma2 = self.I(SMA, close, self.n2)
+
+    def next(self):
+        if crossover(self.sma1, self.sma2):
+            self.buy()
+        elif crossover(self.sma2, self.sma1):
+            self.sell()
 
 def calculate_sma__days(df: pd.DataFrame, days):
     return ta.sma(df['Close'], int(days))
