@@ -164,3 +164,16 @@ def sma_strategy_buy_sell(df: pd.DataFrame):
             signalBuy.append(np.nan)
             signalSell.append(np.nan)
     return pd.Series([signalBuy, signalSell])
+
+# Reuse composable base trading strategies that are part of backtesting.py software distribution
+# bt = Backtest(GOOG, SmaCross, commission=.002)
+# bt.run()
+# bt.plot()
+
+# bt = Backtest(GOOG, SmaCross, cash=10_000, commission=.002)
+# stats = bt.run()
+# stats = bt.optimize(n1=range(5, 30, 5),
+#                     n2=range(10, 70, 5),
+#                     maximize='Equity Final [$]',
+#                     constraint=lambda param: param.n1 < param.n2)
+# bt.plot(plot_volume=False, plot_pl=False)
