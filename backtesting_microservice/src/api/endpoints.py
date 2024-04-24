@@ -1,16 +1,22 @@
 # -*- coding: utf-8 -*-
+from jinja2 import TemplateNotFound
 from markupsafe import escape
-from flask import abort, app, Blueprint, jsonify, redirect, render_template, request, url_for
+from flask import abort, app, Blueprint, jsonify, redirect, render_template, abort, request, url_for
 from src.utils.common import get_config
+# from src.models import Backtest
 
 # api_key = get_config('')
-route = Blueprint('default', __name__)
+backtesting_bp = Blueprint('backtesting_bp', __name__,
+    template_folder='templates')
+# backtesting_bp = Blueprint('backtesting_bp', __name__,
+#     template_folder='templates',
+#     static_folder='static', static_url_path='assets')
 
-# @route.errorhandler(404)
+# @backtesting_bp.errorhandler(404)
 # def not_found():
 #     return redirect(url_for('not_found'))
 
-# @route('/not-found')
+# @backtesting_bp('/not-found')
 # def page_not_found(error):
 #     abort(404)
 
@@ -18,16 +24,15 @@ route = Blueprint('default', __name__)
 # ------- ROOT -------
 # --------------------    
 # http://127.0.0.1:5000/
-@route.route("/")
-# @cache.cached(timeout=60)
-def index():
-    version = "v1.0.0"
-    return jsonify({"MDI API -/" : format(escape(version))})
+@backtesting_bp.route("/", defaults={'page': 'index'})
+@backtesting_bp.route("/api")
+@backtesting_bp.route('/<page>')
+def show(page):
+    try:
+        return render_template(f'pages/{page}.html')
+    except TemplateNotFound:
+        abort(404)
 
-@route.route("/api")
-def helloworld():
-    return jsonify({"status": 200, "msg":"MDI API"})
-
-@route.route("/api/ping")
+@backtesting_bp.route("/api/ping")
 def ping():
-    return jsonify({"status": 200, "msg":"You pinged the MDI API"})
+    return jsonify({"status": 200, "msg":"You pinged the Backtesting API"})

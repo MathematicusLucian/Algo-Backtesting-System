@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import pkgutil
 import importlib
-from flask import Blueprint
+from flask import Blueprint, Flask
 # from pathlib import Path
 import os
 from dotenv import load_dotenv
 
 # return rv (list): list of blueprints
-def register_blueprints(app, package_name, package_path):
+def register_blueprints__generic(app: Flask, package_name, package_path):
     blue_prints = []
     for _, name, _ in pkgutil.iter_modules(package_path):
         files = importlib.import_module('%s.%s' % (package_name, name))
