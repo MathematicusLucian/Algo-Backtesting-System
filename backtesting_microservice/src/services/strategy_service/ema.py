@@ -8,6 +8,26 @@ import plotly.graph_objects as go
 from pandas_datareader import data as pdr
 import yfinance as yfin
 yfin.pdr_override()
+from backtesting import Strategy
+from backtesting.lib import crossover, resample_apply
+
+class ema_cross(Strategy):
+    span1 = 10
+    span2 = 20
+
+    def init(self):
+        Close1 = self.data.Close
+        self.ma1 = self.I(func=self.ema, values=Close1, n=self.span1)
+        self.ma2 = self.I(func=self.ema, values=Close1, n=self.span2)
+
+    def next(self):
+        if crossover(series1=self.ma1, series2=self.ma2):
+            self.buy()
+        elif crossover(series1=self.ma2, series2=self.ma1):
+            self.sell()
+
+    def ema(self, values, n):
+        return pd.Series(values).ewm(span=n).mean()
 
 def calculate_ema(df) -> pd.DataFrame:
     df["ema12"] = ta.ema(df["close"], length=12, fillna=df.close)

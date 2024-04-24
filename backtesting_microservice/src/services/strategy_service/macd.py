@@ -8,10 +8,87 @@ import plotly.graph_objects as go
 from pandas_datareader import data as pdr
 import yfinance as yfin
 yfin.pdr_override()
+from backtesting import Strategy
+from backtesting.lib import crossover
+from backtesting.test import SMA
+
+class MACDStrategy(Strategy):
+    params = (
+        ('fast', 12),
+        ('slow', 26),
+        ('signal', 9),
+    )
+    threshold_plus = 0
+    threshold_minus = -150
+
+    def init(self):
+        close = pd.Series(self.data.Close)
+        macd, signal = self.macd(close, fast = int(self.params[0][1]), slow = int(self.params[1][1]), signal = int(self.params[2][1]))
+        self.macd_diff = self.I(macd - signal)
+
+    def next(self):
+        if self.macd_diff.crossed_above(0):
+            self.buy()
+        elif self.macd_diff.crossed_below(0):
+            self.sell()
+
+    def macd(self, close, fast, slow, signal):
+        exp1 = close.ewm(span=fast, adjust=False).mean()
+        exp2 = close.ewm(span=slow, adjust=False).mean()
+        macd = exp1 - exp2
+        signal = macd.ewm(span=signal, adjust=False).mean()
+        return macd, signal
+    
+class MACDandRSI(Strategy):
+    MACDshort = 12 
+    MACDlong = 26 
+    MACDsignal = 9 
+    MACDThreshold = 0
+    upper_bound = 70
+    lower_bound = 30
+    rsi_window = 14
+
+    def init(self):
+        self.macd, self.macdsignal = self.I(calculate_macd_2, self.data.Close, self.MACDshort, self.MACDlong, self.MACDsignal)
+        self.rsi = self.I(ta.RSI, self.data.Close, self.rsi_window)
+
+    def next(self): 
+        if self.rsi[-1] > self.upper_bound or self.macd > self.MACDThreshold and self.macdsignal > self.MACDThreshold and crossover(self.macdsignal, self.macd):
+            self.position.close()
+        elif self.rsi[-1] < self.lower_bound and self.macd < self.MACDThreshold and self.macdsignal < self.MACDThreshold and crossover(self.macd, self.macdsignal):
+            if not self.position:
+                self.buy() 
+
+class MACDandRSI_WithShortPosition(Strategy):
+    MACDshort = 12 
+    MACDlong = 26 
+    MACDsignal = 9 
+    MACDThreshold = 0
+    upper_bound = 70
+    lower_bound = 30
+    rsi_window = 14
+
+    def init(self):
+        self.macd, self.macdsignal = self.I(calculate_macd_2, self.data.Close, self.MACDshort, self.MACDlong, self.MACDsignal)
+        self.rsi = self.I(ta.RSI, self.data.Close, self.rsi_window)
+
+    def next(self): 
+        if self.rsi[-1] > self.upper_bound or self.macd > self.MACDThreshold and self.macdsignal > self.MACDThreshold and crossover(self.macdsignal, self.macd):
+            if not self.position:
+                self.sell()
+            else:
+                self.position.close()
+        elif self.rsi[-1] < self.lower_bound and self.macd < self.MACDThreshold and self.macdsignal < self.MACDThreshold and crossover(self.macd, self.macdsignal):
+            if not self.position:
+                self.buy()
 
 def calculate_macd(df) -> pd.DataFrame:
     df_macd = ta.macd(df['Close'])
     return pd.concat([df, df_macd], axis=1).reindex(df.index)
+
+def calculate_macd_2(close, macd_short, macd_long, macd_signal):
+    macd, macd_signal, macd_hist = ta.MACD(close, fastperiod=macd_short, slowperiod=macd_long, signalperiod=macd_signal)
+    return macd, macd_signal, macd_hist
 
 def calculate_macd_trend(df) -> pd.DataFrame:
     macd_trend = ta.trend.MACD(df['Close'])

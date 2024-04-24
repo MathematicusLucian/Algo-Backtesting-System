@@ -38,6 +38,69 @@ class RsiOscillator__Single(Strategy):
     #         else:
     #             self.buy()
 
+class RSI_Simple(Strategy):
+    ww_rsi = 14
+    oversold_level = 30
+    overbought_level = 70
+
+    def init(self):
+        Close1 = self.data.Close
+        self.rsi_14 = self.I(rsi, Close1, self.ww_rsi)
+
+    def next(self):
+        if self.rsi_14 < self.oversold_level:
+            self.buy()
+        elif self.rsi_14 > self.overbought_level:
+            self.sell()
+
+
+class RSI_Simple_Close(Strategy):
+    ww_rsi = 14
+    oversold_level = 20
+    overbought_level = 80
+
+    def init(self):
+        Close1 = self.data.Close
+        self.rsi_14 = self.I(rsi, Close1, self.ww_rsi)
+
+    def next(self):
+        if not self.position:
+            if self.rsi_14 < self.oversold_level:
+                self.buy()
+            elif self.rsi_14 > self.overbought_level:
+                self.sell()
+        if self.position:
+            if self.rsi_14 < self.oversold_level:
+                self.position.close()
+            elif self.rsi_14 > self.overbought_level:
+                self.position.close()
+
+class RSI_LS_Close(Strategy):
+    s_rsi = 6
+    l_rsi = 24
+    ww_rsi = 14
+    oversold_level = 20
+    overbought_level = 80
+
+    def init(self):
+        Close1 = self.data.Close
+        self.rsi_14 = self.I(rsi, Close1, self.ww_rsi)
+
+        self.st_rsi = self.I(rsi, Close1, self.s_rsi)
+        self.lt_rsi = self.I(rsi, Close1, self.l_rsi)
+
+    def next(self):
+        if not self.position:
+            if self.st_rsi < self.oversold_level and self.lt_rsi < self.oversold_level:
+                self.buy()
+            elif self.st_rsi > self.overbought_level and self.lt_rsi > self.overbought_level:
+                self.sell()
+        if self.position:
+            if self.st_rsi < self.oversold_level or self.lt_rsi < self.oversold_level:
+                self.position.close()
+            elif self.st_rsi > self.overbought_level or self.lt_rsi > self.overbought_level:
+                self.position.close()
+
 class RsiOscillator__DailyWeekly(Strategy):
     def init(self, upper_bound, lower_bound, rsi_window):
         super(RsiOscillator__DailyWeekly, self).__init__(upper_bound, lower_bound, rsi_window, tp=None, sl=None)
@@ -59,3 +122,12 @@ class RsiOscillator__DailyWeekly(Strategy):
 
 def relative_strength_index(df: pd.DataFrame, days):
     return ta.rsi(df['Close'], int(days))
+
+def rsi(array, n):
+    gain = pd.Series(array).diff()
+    loss = gain.copy()
+    gain[gain < 0] = 0
+    loss[loss > 0] = 0
+    rs = gain.rolling(n).mean() / loss.abs().rolling(n).mean()
+    return 100 - 100 / (1 + rs)
+
