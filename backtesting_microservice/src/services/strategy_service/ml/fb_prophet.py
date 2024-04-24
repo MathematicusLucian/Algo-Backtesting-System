@@ -1,12 +1,13 @@
 from matplotlib import pyplot as plt
 import pandas as pd
+from pandas_datareader import data as pdr
 import yfinance as yf
 from datetime import date
 from fbprophet import Prophet
 from fbprophet.plot import plot_plotly
 from plotly import graph_objs as go
 
-data = pd.df = pd.read_csv("stock_data")
+data = pd.df = pdr.DataReader("TSLA","yahoo") #pd.read_csv("stock_data")
 n_years = 1
 period = n_years*365
 data.reset_index(inplace = True)
