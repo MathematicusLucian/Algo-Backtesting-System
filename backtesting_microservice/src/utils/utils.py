@@ -18,9 +18,29 @@ from dotenv import main
 main.load_dotenv(main.find_dotenv())
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+import talib as ta  
 # CWD_DIR = os.getcwd()
 # BASE_DIR = os.path.abspath(os.path.join(CWD_DIR, 'src'))
 # load_dotenv(dotenv_path=os.path.join(BASE_DIR, ".env"))
+
+def add_indicators(data):
+    data["RSI"] = ta.RSI(data["Close"])
+    data["EMA"] = ta.EMA(data["Close"])
+    data["WMA"] = ta.WMA(data["Close"])
+    data["ROC"] = ta.ROC(data["Close"])
+    data["TEMA"] = ta.TEMA(data["Close"])
+    data["CMO"] = ta.CMO(data["Close"])
+    data["SAR"] = ta.SAR(data["High"],data["Low"])
+    data["WILLR"] = ta.WILLR(data["High"],data["Low"],data["Close"],timeperiod = 15)
+    data["CCI"] = ta.CCI(data["High"],data["Low"],data["Close"],timeperiod = 15)
+    data["PPO"] = ta.PPO(data["Close"],fastperiod = 6,slowperiod = 15)
+    data["MACD"] = ta.MACD(data["Close"],fastperiod = 6,slowperiod = 15)[0]
+    a = ta.WMA(data["Close"],timeperiod = 15//2)
+    b = data["WMA"]
+    data["HMA"] = ta.WMA(2*a - b,timeperiod = int(15**(0.5)))
+    data["ADX"] = ta.ADX(data["High"],data["Low"],data["Close"],timeperiod = 15)
+    data.dropna(inplace = True)
+    data.set_index("Date",inplace = True)  
 
 def retrieve_chained_header_item(df, first_key, second_key):
     return df[:, (first_key, second_key)]
