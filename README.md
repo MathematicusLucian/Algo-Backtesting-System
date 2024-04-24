@@ -2,13 +2,15 @@
 
 ![Candlesticks chart](./assets/candlesticks.png)
 
-*Flask, Angular, SQLite3, and Docker*:
+*Flask, SciKit, Backtesting.py, TA, TA-Lib, Angular, SQLite3, and Docker*:
 - ``ui``: Angular UI presents performance of cryptocurrencies
 - ``backtesting_microservice``: Flask API to run backtesting of strategy - libraries/dependencies: ``backtesting.py``, and technical analysis: ``TA``/``TA-Lib``.
 - ``mdi_microservice``: MDI (Market data and indicators) Microservice - Flask API to fetch market data from OKX, CoinGecko, and my LiveCoinWatch library which is an interface to the [LiveCoinWatch API](https://www.livecoinwatch.com/), deployed to [PyPi](https://pypi.org/project/LiveCoinWatch/1.0.0/).
 - ``sentiment_microservice``: Flask API to scrape X/Twitter and determine sentiment.
 
 ## Backtesting Microservice: Strategy
+
+![Strats](./assets/strats.png)
 
 ### Bollinger Bands
 ![Bollinger chart](./assets/bollinger.png)
@@ -45,6 +47,10 @@ A signal line, often a 9-day EMA, is plotted on top of the MACD line. This signa
 The MACD histogram, the visual representation of the difference between the MACD line and the signal line, provides insights into the strength and direction of the trend.
 
 ``MACDHistogram=MACDLine−SignalLine``
+
+### Machine Learning
+
+SciKit
 
 ## Architecture
 
