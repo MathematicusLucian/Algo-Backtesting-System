@@ -9,6 +9,25 @@ from src.services.strategy_service.system_strat import System
 from src.services.strategy_service.rsi import RsiOscillator__Single, RsiOscillator__DailyWeekly
 from src.services.strategy_service.sma import Sma4Cross, SmaCross
 
+def optim_func(series):
+    if series["Expectancy [%]"] < 0:
+        return -1
+    if series["Max. Drawdown [%]"] > 20:
+        return -1
+    if series["Profit Factor"] < 1:
+        return -1
+    if series["Sharpe Ratio"] < 1.5:
+        return -1
+    if series["SQN"] < 2.5:
+        return -1
+    if series["# Trades"] < 7:
+        return -1
+    if series["Win Rate [%]"] < 40:
+        return -1
+    if series["Worst Trade [%]"] < -20:
+        return -1
+    return series["Equity Final [$]"]
+
 #SciKit Machine Learning
 # ml()
 

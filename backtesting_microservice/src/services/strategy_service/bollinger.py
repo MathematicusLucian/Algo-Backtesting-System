@@ -1,9 +1,9 @@
 from datetime import date
 import numpy as np
 import pandas as pd
-# import talib
 from ta import momentum
 import pandas_ta as pta
+import talib as ta
 from finta import TA
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
@@ -17,6 +17,11 @@ def BBANDS(data, n_lookback, n_std):
     mean, std = hlc3.rolling(n_lookback).mean(), hlc3.rolling(n_lookback).std()
     upper = mean + n_std*std
     lower = mean - n_std*std
+    return upper, lower
+
+def BBANDS_2(close, n, nu, nd):
+    # df["upper"], df["middle"], df["lower"] = ta.BBANDS(close, timeperiod=span02, nbdevdn=2, nbdevup = 2, matype = 0)
+    upper, middle, lower = ta.BBANDS(close, timeperiod=n, nbdevup=nu, nbdevdn=nd, matype=0)
     return upper, lower
 
 def bbands(data, SMA):
