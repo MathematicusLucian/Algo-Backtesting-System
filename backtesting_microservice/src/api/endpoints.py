@@ -7,13 +7,15 @@ from markupsafe import escape
 from flask import abort, app, Blueprint, jsonify, redirect, render_template, abort, request, url_for
 # from flask import (_request_ctx_stack, abort, current_app, flash, redirect,
 #                    request, session, url_for)
-# from flask.signals import Namespace
+from flask.ext.cache import Cache
 # from flask.ext.login import login_required, current_user
+# from flask.signals import Namespace
 # from werkzeug.local import LocalProxy
 # from werkzeug.security import safe_str_cmp
 # from werkzeug.urls import url_decode, url_encode
 from src.utils.common import get_config
 # from src.models import Backtest
+cache = Cache(app)
 
 # if sys.version < '3':  # pragma: no cover
 #     from urlparse import urlparse, urlunparse
@@ -75,6 +77,7 @@ def show(page):
         abort(404)
 
 @backtesting_bp.route("/api/ping")
+@cache.cached(timeout=60)
 def ping():
     return jsonify({"status": 200, "msg":"You pinged the Backtesting API"})
 

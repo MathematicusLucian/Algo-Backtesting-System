@@ -1,6 +1,8 @@
+from datetime import datetime
 from backtesting import Backtest, Strategy
 from backtesting.test import GOOG
 from backtesting.lib import crossover, plot_heatmaps, resample_apply
+from pandas_datareader import data as pdr
 import matplotlib.pyplot as plt
 import seaborn as sns
 from src.services.strategy_service.macd import MACDStrategy
@@ -28,6 +30,11 @@ def optim_func(series):
         return -1
     return series["Equity Final [$]"]
 
+start = datetime(2022,1,1)
+end = datetime(2024,1,1)
+data = pdr.DataReader("TSLA","yahoo")
+data.to_csv("data/stock_data.csv")
+
 #SciKit Machine Learning
 # ml()
 
@@ -39,7 +46,7 @@ def optim_func(series):
 #                   level=range(30, 80, 10))
 # backtest.plot()
 
-bt = Backtest(GOOG, MACDStrategy, cash=10000, commission=.002, exclusive_orders=True)
-results = bt.run()
-print(results)
-bt.plot()
+# bt = Backtest(GOOG, MACDStrategy, cash=10000, commission=.002, exclusive_orders=True)
+# results = bt.run()
+# print(results)
+# bt.plot()

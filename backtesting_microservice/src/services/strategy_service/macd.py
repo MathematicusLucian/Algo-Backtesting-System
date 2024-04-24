@@ -1,11 +1,11 @@
-from datetime import date
+from datetime import datetime, date
 import numpy as np
 import pandas as pd
 import pandas_ta as ta
+import pandas_datareader as web
 from ta import momentum
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-from pandas_datareader import data as pdr
 import yfinance as yfin
 yfin.pdr_override()
 from backtesting import Strategy
@@ -14,12 +14,14 @@ from backtesting.test import SMA
 
 class MACDStrategy(Strategy):
     params = (
-        ('fast', 12),
-        ('slow', 26),
-        ('signal', 9),
+        ('fast', 12), #12 day EMA
+        ('slow', 26), #23 day EMA
+        ('signal', 9), #9 day EMA
     )
     threshold_plus = 0
     threshold_minus = -150
+    # macd = 0
+    # macd_signal = 0
 
     def init(self):
         close = pd.Series(self.data.Close)
@@ -28,8 +30,10 @@ class MACDStrategy(Strategy):
 
     def next(self):
         if self.macd_diff.crossed_above(0):
+        # if crossover(self.macd, self.macd_signal):
             self.buy()
         elif self.macd_diff.crossed_below(0):
+        # if crossover(self.macd_signal, self.macd):
             self.sell()
 
     def macd(self, close, fast, slow, signal):
@@ -38,6 +42,11 @@ class MACDStrategy(Strategy):
         macd = exp1 - exp2
         signal = macd.ewm(span=signal, adjust=False).mean()
         return macd, signal
+    
+    # def macd_other_method(self):
+    #     price = self.data.Close
+    #     self.macd = self.I(lambda x: talib.MACD(x)[0], price)
+    #     self.macd_signal = self.I(lambda x: talib.MACD(x)[1], price)
 
 class MACDCross(Strategy):
     MACD_short = 12 

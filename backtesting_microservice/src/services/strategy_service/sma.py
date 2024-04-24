@@ -1,11 +1,11 @@
-from datetime import date
+# from datetime import date
 import numpy as np
 import pandas as pd
 import pandas_ta as ta
-from ta import momentum
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
-from pandas_datareader import data as pdr
+# from ta import momentum
+# import matplotlib.pyplot as plt
+# import plotly.graph_objects as go
+# from pandas_datareader import data as pdr
 import yfinance as yfin
 yfin.pdr_override()
 # https://kernc.github.io/backtesting.py/doc/backtesting/#gsc.tab=0
@@ -18,41 +18,33 @@ def SMA(values, n):
     return pd.Series(values).rolling(n).mean()
 
 class SmaCross(Strategy):
-    # Define the two MA lags as *class variables*
-    # for later optimization
     n1 = 10
     n2 = 20
-    period1 = 10
-    period2 = 20
     
     def init(self):
-        # Precompute the two moving averages
-        self.sma1 = self.I(SMA, self.data.Close, self.n1)
-        self.sma2 = self.I(SMA, self.data.Close, self.n2)
-
-        # Close1 = self.data.Close
-        # self.ma1 = self.I(func=SMA, arr=Close1, n=self.period1)
-        # self.ma2 = self.I(func=SMA, arr=Close1, n=self.period2)
+        Close1 = self.data.Close
+        self.sma1 = self.I(SMA, Close1, self.n1)
+        self.sma2 = self.I(SMA, Close1, self.n2)
     
     def next(self):
-        # If sma1 crosses above sma2, close any existing short trades, and buy the asset
+        # sma1 crosses above sma2 -> close short-trades, and buy the asset
         if crossover(self.sma1, self.sma2):
             self.position.close()
             self.buy()
-        # Else, if sma1 crosses below sma2, close any existing long trades, and sell the asset
+        # sma1 crosses below sma2 -> close long-trades, and sell the asset
         elif crossover(self.sma2, self.sma1):
             self.position.close()
             self.sell()
 
-        # if (self.sma1[-2] < self.sma2[-2] and
-        #         self.sma1[-1] > self.sma2[-1]):
+        # Consider day prior
+        # if (self.sma1[-2] < self.sma2[-2] and self.sma1[-1] > self.sma2[-1]):
         #     self.position.close()
         #     self.buy()
-        # elif (self.sma1[-2] > self.sma2[-2] and    # Ugh!
-        #       self.sma1[-1] < self.sma2[-1]):
+        # elif (self.sma1[-2] > self.sma2[-2] and self.sma1[-1] < self.sma2[-1]):
         #     self.position.close()
         #     self.sell()
 
+        # Multi-series
         # if crossover(series1=self.ma1, series2=self.ma2):
         #     self.buy()
         # elif crossover(series1=self.ma2, series2=self.ma1):
@@ -63,29 +55,17 @@ class SmaCross__Trailing(SignalStrategy, TrailingStrategy):
     n2 = 25
     
     def init(self):
-        # In init() and in next() it is important to call the
-        # super method to properly initialize the parent classes
         super().init()
         
-        # Precompute the two moving averages
         sma1 = self.I(SMA, self.data.Close, self.n1)
         sma2 = self.I(SMA, self.data.Close, self.n2)
         
-        # Where sma1 crosses sma2 upwards. Diff gives us [-1,0, *1*]
+        # sma1 crosses sma2 upwards -> diff gives us [-1,0, *1*]
         signal = (pd.Series(sma1) > sma2).astype(int).diff().fillna(0)
-        signal = signal.replace(-1, 0)  # Upwards/long only
-        
-        # Use 95% of available liquidity (at the time) on each order.
-        # (Leaving a value of 1. would instead buy a single share.)
-        entry_size = signal * .95
-                
-        # Set order entry sizes using the method provided by 
-        # `SignalStrategy`. See the docs.
-        self.set_signal(entry_size=entry_size)
-        
-        # Set trailing stop-loss to 2x ATR using
-        # the method provided by `TrailingStrategy`
-        self.set_trailing_sl(2)
+        signal = signal.replace(-1, 0)  # upwards/long only
+        entry_size = signal * .95 #  95% of available liquidity (at the time) on each order
+        self.set_signal(entry_size=entry_size) #Set order entry sizes using the method provided by `SignalStrategy`. See the docs.
+        self.set_trailing_sl(2) #Set trailing stop-loss to 2x ATR using the method provided by `TrailingStrategy`
 
 class Sma4Cross(Strategy):
     n1 = 50
@@ -100,35 +80,18 @@ class Sma4Cross(Strategy):
         self.sma_exit = self.I(SMA, self.data.Close, self.n_exit)
         
     def next(self):
-        
         if not self.position:
-            
-            # On upwards trend, if price closes above
-            # "entry" MA, go long
-            
-            # Here, even though the operands are arrays, this
-            # works by implicitly comparing the two last values
+            # upwards trend + price closes above "entry" MA -> go long
             if self.sma1 > self.sma2:
                 if crossover(self.data.Close, self.sma_enter):
                     self.buy()
-                    
-            # On downwards trend, if price closes below
-            # "entry" MA, go short
-            
-            else:
+            else: # :. downwards trend + price closes below "entry" MA -> go short
                 if crossover(self.sma_enter, self.data.Close):
                     self.sell()
-        
-        # But if we already hold a position and the price
-        # closes back below (above) "exit" MA, close the position
-        
+        # holding a position + price closes back below (above) "exit" MA -> close the position
         else:
-            if (self.position.is_long and
-                crossover(self.sma_exit, self.data.Close)
-                or
-                self.position.is_short and
-                crossover(self.data.Close, self.sma_exit)):
-                
+            if (self.position.is_long and crossover(self.sma_exit, self.data.Close) or
+                    self.position.is_short and crossover(self.data.Close, self.sma_exit)):
                 self.position.close()
 
 def calculate_sma__days(df: pd.DataFrame, days):
