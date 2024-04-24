@@ -38,49 +38,51 @@ class MACDStrategy(Strategy):
         macd = exp1 - exp2
         signal = macd.ewm(span=signal, adjust=False).mean()
         return macd, signal
-    
-class MACDandRSI(Strategy):
-    MACDshort = 12 
-    MACDlong = 26 
-    MACDsignal = 9 
-    MACDThreshold = 0
-    upper_bound = 70
-    lower_bound = 30
-    rsi_window = 14
+
+class MACDCross(Strategy):
+    MACD_short = 12 
+    MACD_long = 26
+    MACD_signal = 9 
+    MACD_threshold_plus = 0
+    MACD_threshold_minus = -150
 
     def init(self):
-        self.macd, self.macdsignal = self.I(calculate_macd_2, self.data.Close, self.MACDshort, self.MACDlong, self.MACDsignal)
-        self.rsi = self.I(ta.RSI, self.data.Close, self.rsi_window)
+        self.macd, self.MACD_signal, self.macdhist = self.I(calculate_macd_2, self.data.Close, self.MACD_short, self.MACD_long, self.MACD_signal)
 
     def next(self): 
-        if self.rsi[-1] > self.upper_bound or self.macd > self.MACDThreshold and self.macdsignal > self.MACDThreshold and crossover(self.macdsignal, self.macd):
-            self.position.close()
-        elif self.rsi[-1] < self.lower_bound and self.macd < self.MACDThreshold and self.macdsignal < self.MACDThreshold and crossover(self.macd, self.macdsignal):
+        if self.macd < self.MACD_threshold_minus and self.MACD_signal < self.MACD_threshold_minus and crossover(self.macd, self.MACD_signal):
             if not self.position:
                 self.buy() 
+        elif self.position and self.macdhist[-1] < self.macdhist[-2] and self.macdhist[-2] < self.macdhist[-3]:
+            self.position.close()
+        elif self.position and crossover(self.MACD_signal, self.macd):
+            self.position.close()
 
-class MACDandRSI_WithShortPosition(Strategy):
-    MACDshort = 12 
-    MACDlong = 26 
-    MACDsignal = 9 
-    MACDThreshold = 0
-    upper_bound = 70
-    lower_bound = 30
-    rsi_window = 14
+class MACDCross_WithShortPosition(Strategy):
+    MACD_short = 12 
+    MACD_long = 26 
+    MACD_signal = 9 
+    MACD_threshold_plus = 460
+    MACD_threshold_minus = -140
 
     def init(self):
-        self.macd, self.macdsignal = self.I(calculate_macd_2, self.data.Close, self.MACDshort, self.MACDlong, self.MACDsignal)
-        self.rsi = self.I(ta.RSI, self.data.Close, self.rsi_window)
+        self.macd, self.MACD_signal, self.macdhist = self.I(calculate_macd_2, self.data.Close, self.MACD_short, self.MACD_long, self.MACD_signal)
 
     def next(self): 
-        if self.rsi[-1] > self.upper_bound or self.macd > self.MACDThreshold and self.macdsignal > self.MACDThreshold and crossover(self.macdsignal, self.macd):
+        if self.macd < self.MACD_threshold_minus and self.MACD_signal < self.MACD_threshold_minus and crossover(self.macd, self.MACD_signal):
             if not self.position:
-                self.sell()
-            else:
-                self.position.close()
-        elif self.rsi[-1] < self.lower_bound and self.macd < self.MACDThreshold and self.macdsignal < self.MACDThreshold and crossover(self.macd, self.macdsignal):
+                self.buy() 
+        elif self.macd > self.MACD_threshold_plus and self.MACD_signal > self.MACD_threshold_plus and crossover(self.MACD_signal, self.macd):
             if not self.position:
-                self.buy()
+                self.sell() 
+        elif self.position.is_long and self.macdhist[-1] < self.macdhist[-2] and self.macdhist[-2] < self.macdhist[-3]:
+            self.position.close()
+        elif self.position.is_short and self.macdhist[-1] > self.macdhist[-2] and self.macdhist[-2] > self.macdhist[-3]:
+            self.position.close()
+        elif self.position.is_long and crossover(self.MACD_signal, self.macd):
+            self.position.close()
+        elif self.position.is_short and crossover(self.macd, self.MACD_signal):
+            self.position.close()
 
 def calculate_macd(df) -> pd.DataFrame:
     df_macd = ta.macd(df['Close'])
