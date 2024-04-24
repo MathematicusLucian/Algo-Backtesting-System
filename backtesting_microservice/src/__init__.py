@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, Flask
+from flask import Blueprint, Flask, url_for
 from src.settings import config
 from src.utils.common import register_blueprints__generic
 # from src.utils.utils import save_dataframe
@@ -20,6 +20,10 @@ from src.utils.common import register_blueprints__generic
 # # order management
 # orders_container = []
 
+# admin = Blueprint('admin', __name__, static_folder='static')
+# admin = Blueprint('admin', __name__, template_folder='templates')
+# url_for('admin.static', filename='style.css')
+
 icons_bp = Blueprint('icons_bp', __name__,
     static_folder='static',
     static_url_path='icons')
@@ -27,6 +31,9 @@ icons_bp = Blueprint('icons_bp', __name__,
 charts_module_bp = Blueprint('charts_module_bp', __name__,
     static_folder='services/chart_service',
     static_url_path='charts')
+
+# with icons_bp.open_resource('static/icons') as f:
+#     code = f.read()
 
 # with charts_module_bp.open_resource('services/chart_service') as f:
 #     code = f.read()
@@ -39,4 +46,6 @@ def create_app(config_type, package_name, package_path):
     register_blueprints__generic(app, package_name, package_path)
     app.register_blueprint(icons_bp, url_prefix='/icons')
     app.register_blueprint(charts_module_bp, url_prefix='/charts')
+    # with app.open_resource('static') as f:
+    #     code = f.read()
     return app
