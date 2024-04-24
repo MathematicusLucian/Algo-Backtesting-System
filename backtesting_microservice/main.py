@@ -35,7 +35,6 @@ def optim_func(series):
 # data = pdr.DataReader("TSLA","yahoo")
 # data.to_csv("data/stock_data.csv")
 
-
 #SciKit Machine Learning
 # ml()
 
