@@ -11,14 +11,18 @@ yfin.pdr_override()
 from backtesting import Strategy
 from backtesting.lib import crossover, resample_apply
 
-class ema_cross(Strategy):
-    span1 = 10
-    span2 = 20
+def EMA_Backtesting(values, n):
+    close = pd.Series(values)
+    return ta.EMA(close, timeperiod=n)
+
+class EMA_Cross(Strategy):
+    EMA_short = 10
+    EMA_long = 20
 
     def init(self):
         Close1 = self.data.Close
-        self.ma1 = self.I(func=self.ema, values=Close1, n=self.span1)
-        self.ma2 = self.I(func=self.ema, values=Close1, n=self.span2)
+        self.ma1 = self.I(func=self.ema, values=Close1, n=self.EMA_short)
+        self.ma2 = self.I(func=self.ema, values=Close1, n=self.EMA_long)
 
     def next(self):
         if crossover(series1=self.ma1, series2=self.ma2):
@@ -28,6 +32,39 @@ class ema_cross(Strategy):
 
     def ema(self, values, n):
         return pd.Series(values).ewm(span=n).mean()
+
+class Ema_Cross2(Strategy):
+    EMA_short = 5
+    EMA_long = 10
+
+    def init(self):
+        self.ema1 = self.I(EMA_Backtesting, self.data.Close, self.EMA_short)
+        self.ema2 = self.I(EMA_Backtesting, self.data.Close, self.EMA_long)
+
+    def next(self):
+        if crossover(self.ema1, self.ema2):
+            if not self.position:
+                self.buy() 
+        elif crossover(self.ema2, self.ema1):
+            self.position.close()
+
+class Ema_Cross__WithShortPosition(Strategy):
+    EMAshort = 5
+    EMAlong = 10
+
+    def init(self):
+        self.ema1 = self.I(EMA_Backtesting, self.data.Close, self.EMAshort)
+        self.ema2 = self.I(EMA_Backtesting, self.data.Close, self.EMAlong)
+
+    def next(self):
+        if crossover(self.ema1, self.ema2):
+            if not self.position:
+                self.buy() 
+        elif crossover(self.ema2, self.ema1):
+            if not self.position:
+                self.sell()
+            else:
+                self.position.close()
 
 def calculate_ema(df) -> pd.DataFrame:
     df["ema12"] = ta.ema(df["close"], length=12, fillna=df.close)
