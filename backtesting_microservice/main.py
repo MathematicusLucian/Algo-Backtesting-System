@@ -30,10 +30,11 @@ def optim_func(series):
         return -1
     return series["Equity Final [$]"]
 
-start = datetime(2022,1,1)
-end = datetime(2024,1,1)
-data = pdr.DataReader("TSLA","yahoo")
-data.to_csv("data/stock_data.csv")
+# start = datetime(2022,1,1)
+# end = datetime(2024,1,1)
+# data = pdr.DataReader("TSLA","yahoo")
+# data.to_csv("data/stock_data.csv")
+
 
 #SciKit Machine Learning
 # ml()

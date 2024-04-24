@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 import pandas as pd
 import yfinance as yf
 from datetime import date
@@ -12,13 +13,29 @@ data.reset_index(inplace = True)
 df_train = data[['Date','Close']]
 df_train = df_train.rename(columns = {"Date":"ds", "Close":'y'})
 
-m = Prophet()
-m.fit(df_train)
-future = m.make_future_dataframe(periods = period)
-forecast = m.predict(future)
-print(f'Forecast plot for {n_years} years')
-fig1 = plot_plotly(m,forecast)
-# fig1 = m.plot(forecast)
-fig1.savefig('prophet_plot.svg')
-fig2 = m.plot_components(forecast)
-fig1.savefig('prophet_components_plot.svg')
+prophet = Prophet(daily_seasonality=True)
+
+future = prophet.make_future_dataframe(periods = period)
+forecast = prophet.predict(future)
+future_dates = prophet.make_future_dataframe(periods=365)
+predictions = prophet.predict(future_dates)
+fig = plot_plotly(prophet, predictions)
+
+unknown_data = data.iloc[-90:]
+data = data.iloc[:-90]
+future_dates(prophet.make_future_dataframe(periods=365))
+predictions = prophet.predict(future_dates)
+fig = plot_plotly(prophet, predictions)
+
+plt.figure(figsize=(12,8))
+pred = predictions[predictions['ds'].isin(unknown_data['ds'])]
+plt.plot(pd.to_datetime(unknown_data['ds']), unknown_data['y'], label="Actual")
+plt.plot(pd.to_datetime(unknown_data['ds']), pred['yhat'], label="Actual")
+plt.legend()
+
+fig = plot_plotly(prophet,forecast)
+# fig = prophet.plot(forecast)
+fig.savefig('prophet_plot.svg')
+
+fig = prophet.plot_components(forecast)
+fig.savefig('prophet_components_plot.svg')
