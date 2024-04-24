@@ -1,5 +1,6 @@
 from backtesting import Strategy
 from backtesting.lib import resample_apply
+import talib as ta
 
 class Momentum(Strategy):
     small_threshold = 0
@@ -28,3 +29,19 @@ class Momentum(Strategy):
                 self.buy()
             elif change_long < -1 * self.large_threshold and change_short < -1 * self.small_threshold:
                 self.sell()
+
+class Momentum__Volatility(Strategy):
+    lookback_period = 10
+    atr_period = 15
+    atr_threshold = 2.5    
+    
+    def init(self):
+        close = self.data.Close
+        self.returns = self.I(ta.MOM, close, self.lookback_period)
+        self.atr = self.I(ta.ATR, self.data.High, self.data.Low, close, self.atr_period)
+
+    def next(self):
+        if self.returns[-1] > 0 and self.atr[-1] > self.atr_threshold:
+            self.sell()
+        elif self.returns[-1] < 0 and self.atr[-1] > self.atr_threshold:
+            self.buy()
