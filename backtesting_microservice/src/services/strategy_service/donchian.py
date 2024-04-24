@@ -3,13 +3,13 @@ import pandas as pd
 import talib as ta
 import numpy as np
 
-def CalcDonchian_High(values, dnchn_span_long):
-    dnchnline = pd.Series(values)
-    return dnchnline.rolling(window = dnchn_span_long).max()
+def CalcDonchian_High(values, donchian_span_long):
+    donchianline = pd.Series(values)
+    return donchianline.rolling(window = donchian_span_long).max()
 
-def CalcDonchian_Low(values, dnchn_span_short):
-    dnchnline = pd.Series(values)
-    return dnchnline.rolling(window = dnchn_span_short).min()
+def CalcDonchian_Low(values, donchian_span_short):
+    donchianline = pd.Series(values)
+    return donchianline.rolling(window = donchian_span_short).min()
 
 def CalcATR(phigh, plow, pclose, period):
     high = pd.Series(phigh)
@@ -21,54 +21,54 @@ def CalcATR(phigh, plow, pclose, period):
         np.array(close).astype("double"),\
         timeperiod=period)
 
-class DnchnBreakout(Strategy):
-    dnchn_long = 20
-    dnchn_short = 10
+class DonchianBreakout(Strategy):
+    donchian_long = 20
+    donchian_short = 10
     atr_period = 20
 
     def init(self):
-        self.dnchn_high = self.I(CalcDonchian_High, self.data.High, self.dnchn_long)
-        self.dnchn_low = self.I(CalcDonchian_Low, self.data.Low, self.dnchn_short)
+        self.donchian_high = self.I(CalcDonchian_High, self.data.High, self.donchian_long)
+        self.donchian_low = self.I(CalcDonchian_Low, self.data.Low, self.donchian_short)
         self.atr = self.I(CalcATR, self.data.High,  self.data.Low, self.data.Close, self.atr_period)
 
     def next(self): 
         price = self.data.Close[-1]
-        if price > self.dnchn_high[-2]:
+        if price > self.donchian_high[-2]:
             if not self.position:
                 self.buy() 
-        elif price < self.dnchn_low[-2]:
+        elif price < self.donchian_low[-2]:
             self.position.close() # 売り
 
-class DnchnBreakout_WithShortPosition(Strategy):
-    dnchn_long = 20
-    dnchn_short = 10
+class DonchianBreakout_WithShortPosition(Strategy):
+    donchian_long = 20
+    donchian_short = 10
     atr_period = 20
 
     def init(self):
-        self.dnchn_high = self.I(CalcDonchian_High, self.data.High, self.dnchn_long) 
-        self.dnchn_low = self.I(CalcDonchian_Low, self.data.Low, self.dnchn_short)
+        self.donchian_high = self.I(CalcDonchian_High, self.data.High, self.donchian_long) 
+        self.donchian_low = self.I(CalcDonchian_Low, self.data.Low, self.donchian_short)
         self.atr = self.I(CalcATR, self.data.High,  self.data.Low, self.data.Close, self.atr_period)
 
     def next(self): 
         price = self.data.Close[-1]
-        if price > self.dnchn_high[-2]:
+        if price > self.donchian_high[-2]:
             if not self.position:
                 self.buy() 
-        elif price < self.dnchn_low[-2]:
+        elif price < self.donchian_low[-2]:
             if not self.position:
                 self.sell()
             else:
                 self.position.close()
 
-class DnchnBreakout_WithATRStopLoss(Strategy):
-    dnchn_long = 40
-    dnchn_short = 20
+class DonchianBreakout_WithATRStopLoss(Strategy):
+    donchian_long = 40
+    donchian_short = 20
     atr_period = 20
     atr_entrytime = 0
 
     def init(self):
-        self.dnchn_high = self.I(CalcDonchian_High, self.data.High, self.dnchn_long)
-        self.dnchn_low = self.I(CalcDonchian_Low, self.data.Low, self.dnchn_short)
+        self.donchian_high = self.I(CalcDonchian_High, self.data.High, self.donchian_long)
+        self.donchian_low = self.I(CalcDonchian_Low, self.data.Low, self.donchian_short)
         self.atr = self.I(CalcATR, self.data.High,  self.data.Low, self.data.Close, self.atr_period)
 
     def next(self): 
@@ -79,8 +79,28 @@ class DnchnBreakout_WithATRStopLoss(Strategy):
             self.position.close()
         elif self.position and self.trades[-1].size < 0 and self.trades[-1].entry_price > price + atr_entrytime * 2:
             self.position.close()
-        elif price > self.dnchn_high[-2]:
+        elif price > self.donchian_high[-2]:
             if not self.position:
                 self.buy() 
-        elif price < self.dnchn_low[-2]:
+        elif price < self.donchian_low[-2]:
             self.position.close() 
+
+class DonchianBreakout_WithPercentageStopLoss(Strategy):
+    donchian_long = 20
+    donchian_short = 10
+    atr_period = 20
+
+    def init(self):
+        self.donchian_high = self.I(CalcDonchian_High, self.data.High, self.donchian_long)
+        self.donchian_low = self.I(CalcDonchian_Low, self.data.Low, self.donchian_short)
+        self.atr = self.I(CalcATR, self.data.High,  self.data.Low, self.data.Close, self.atr_period)
+
+    def next(self):
+        price = self.data.Close[-1]
+        if self.position and self.position.pl_pct < -0.075:
+            self.position.close() 
+        elif price > self.donchian_high[-2]:
+            if not self.position:
+                self.buy() 
+        elif price < self.donchian_low[-2]:
+            self.position.close()
