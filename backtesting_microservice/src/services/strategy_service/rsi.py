@@ -13,10 +13,10 @@ from backtesting.lib import crossover, resample_apply
 from backtesting.test import GOOG
 
 class RsiOscillator__Single(Strategy):
-    def init(self, *args, **kwargs): # upper_bound, lower_bound, rsi_window, tp=None, sl=None, size=None,
+    def init(self): #, *args, **kwargs): # upper_bound, lower_bound, rsi_window, tp=None, sl=None, size=None,
         # super(RsiOscillator__Single, self).__init__(self, upper_bound, lower_bound, rsi_window, tp=None, sl=None)
         # super().__init__(*args, **kwargs)
-        super().init(self, *args, **kwargs)
+        # super().init(self, *args, **kwargs)
     #     self.upper_bound = upper_bound
     #     self.lower_bound = lower_bound
     #     self.rsi_window = rsi_window
@@ -24,6 +24,7 @@ class RsiOscillator__Single(Strategy):
     #     self.tp = tp
     #     self.size = size
     #     self.rsi = self.I(ta.rsi, pd.Series(self.data.Close), self.rsi_window)
+        print(self.params)
 
     def next(self):
         price = self.data.Close[-1]
