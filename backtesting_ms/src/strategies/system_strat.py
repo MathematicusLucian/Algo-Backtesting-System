@@ -31,3 +31,11 @@ class System(Strategy):
         # If the price closes 2% or more below 10-day MA close the position, if any.
         elif price < .98 * self.ma10[-1]:
             self.position.close()
+
+# System
+# backtest = Backtest(GOOG, System, commission=.002)
+# backtest.run()
+# backtest.optimize(d_rsi=range(10, 35, 5),
+#                   w_rsi=range(10, 35, 5),
+#                   level=range(30, 80, 10))
+# backtest.plot()

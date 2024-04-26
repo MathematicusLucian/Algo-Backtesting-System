@@ -18,23 +18,27 @@ class MACDStrategy(Strategy):
         ('slow', 26), #23 day EMA
         ('signal', 9), #9 day EMA
     )
-    threshold_plus = 0
-    threshold_minus = -150
     # macd = 0
     # macd_signal = 0
 
     def init(self):
         close = pd.Series(self.data.Close)
-        macd, signal = self.macd(close, fast = int(self.params[0][1]), slow = int(self.params[1][1]), signal = int(self.params[2][1]))
-        self.macd_diff = self.I(macd - signal)
+        fast = int(self.params[0][1])
+        slow = int(self.params[1][1])
+        signal = int(self.params[2][1])
+        macd, signal = self.macd(close, fast, slow, signal)
+        macd_diff = macd - signal
+        self.macd_diff = self.I(macd_diff)
+        # print(f"\n\n{macd - signal}")
 
     def next(self):
-        if self.macd_diff.crossed_above(0):
+        pass
+        # if self.macd_diff.crossed_above(0):
         # if crossover(self.macd, self.macd_signal):
-            self.buy()
-        elif self.macd_diff.crossed_below(0):
+            # self.buy()
+        # elif self.macd_diff.crossed_below(0):
         # if crossover(self.macd_signal, self.macd):
-            self.sell()
+            # self.sell()
 
     def macd(self, close, fast, slow, signal):
         exp1 = close.ewm(span=fast, adjust=False).mean()
@@ -166,3 +170,8 @@ def macd_strategy(df, risk):
     df['MACD_Sell_Signal_price'] = MACD_Sell
     df['positive'] = macd_color(df)
     return df
+
+# bt = Backtest(GOOG, MACDStrategy, cash=10000, commission=.002, exclusive_orders=True)
+# results = bt.run()
+# print(results)
+# bt.plot()

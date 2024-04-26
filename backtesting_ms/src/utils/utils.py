@@ -227,3 +227,8 @@ def get_range_between_dates(df, date_from, date_to):
 def get_historic_data(currency, date_from, date_to):
     df = fetch_currency_archive_data(currency)
     return get_range_between_dates(df, date_from, date_to)
+
+# start = datetime(2022,1,1)
+# end = datetime(2024,1,1)
+# data = pdr.DataReader("TSLA","yahoo")
+# data.to_csv("data/stock_data.csv")

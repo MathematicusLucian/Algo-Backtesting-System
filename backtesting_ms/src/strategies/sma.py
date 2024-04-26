@@ -18,15 +18,21 @@ def SMA(values, n):
     return pd.Series(values).rolling(n).mean()
 
 class SmaCross(Strategy):
+    # n1 = None
     n1 = 10
+    # n2 = None
     n2 = 20
-    
-    def init(self):
+    def init(self): #, n1=10, n2=20):
         Close1 = self.data.Close
+        # print(self._params["n1"])
+        # self.n1 = self._params["n1"]
+        # self.n2 = self._params["n2"]
         self.sma1 = self.I(SMA, Close1, self.n1)
         self.sma2 = self.I(SMA, Close1, self.n2)
     
     def next(self):
+        # print(f"\n\n{self._params}\n")
+        # print(f"\n\n{self._params["n1"]}\n")
         # sma1 crosses above sma2 -> close short-trades, and buy the asset
         if crossover(self.sma1, self.sma2):
             self.position.close()
