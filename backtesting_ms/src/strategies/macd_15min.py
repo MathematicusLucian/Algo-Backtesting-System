@@ -48,7 +48,7 @@ def pointpos(x):
 def SIGNAL():
     return dfopt.TotalSignal
 
-class Strat(Strategy):
+class Macd_25(Strategy):
     mysize = 3000
     slcoef = 1.1
     TPSLRatio = 1.5
@@ -64,9 +64,9 @@ class Strat(Strategy):
         slatr = self.slcoef*self.data.ATR[-1]
         TPSLRatio = self.TPSLRatio
         # if len(self.trades)>0:
-        #     if self.trades[-1].is_long and self.data.RSI[-1]>=90:
+        #     if self.trades[-1].is_long and self.data.rsi[-1]>=90:
         #         self.trades[-1].close()
-        #     elif self.trades[-1].is_short and self.data.RSI[-1]<=10:
+        #     elif self.trades[-1].is_short and self.data.rsi[-1]<=10:
         #         self.trades[-1].close()
         if self.signal1==2 and len(self.trades)==0:
             sl1 = self.data.Close[-1] - slatr
@@ -77,7 +77,7 @@ class Strat(Strategy):
             tp1 = self.data.Close[-1] - slatr*TPSLRatio
             self.sell(sl=sl1, tp=tp1, size=self.mysize)
 
-class Strat2(Strategy):
+class Macd_25_2(Strategy):
     mysize = 3000
     slcoef = 2.3
     TPSLRatio = 1.6
@@ -94,9 +94,9 @@ class Strat2(Strategy):
         TPSLRatio = self.TPSLRatio
 
         # if len(self.trades)>0:
-        #     if self.trades[-1].is_long and self.data.RSI[-1]>=90:
+        #     if self.trades[-1].is_long and self.data.rsi[-1]>=90:
         #         self.trades[-1].close()
-        #     elif self.trades[-1].is_short and self.data.RSI[-1]<=10:
+        #     elif self.trades[-1].is_short and self.data.rsi[-1]<=10:
         #         self.trades[-1].close()
         
         if self.signal1==2 and len(self.trades)==0:

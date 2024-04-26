@@ -1,5 +1,5 @@
 from backtesting import Strategy
-from src.services.strategy_service.bollinger import BBANDS_2
+from src.strategies.bollinger import BBANDS_2
 
 class BBsigma(Strategy):
     n = 25 

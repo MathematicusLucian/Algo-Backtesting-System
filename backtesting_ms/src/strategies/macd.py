@@ -102,7 +102,7 @@ def calculate_macd(df) -> pd.DataFrame:
     return pd.concat([df, df_macd], axis=1).reindex(df.index)
 
 def calculate_macd_2(close, macd_short, macd_long, macd_signal):
-    macd, macd_signal, macd_hist = ta.MACD(close, fastperiod=macd_short, slowperiod=macd_long, signalperiod=macd_signal)
+    macd, macd_signal, macd_hist = ta.macd(close, fastperiod=macd_short, slowperiod=macd_long, signalperiod=macd_signal)
     return macd, macd_signal, macd_hist
 
 def calculate_macd_trend(df) -> pd.DataFrame:

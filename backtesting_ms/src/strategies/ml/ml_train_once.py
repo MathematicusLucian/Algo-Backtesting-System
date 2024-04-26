@@ -2,7 +2,7 @@ from backtesting import Strategy
 import numpy as np
 import pandas as pd
 from sklearn.neighbors import KNeighborsClassifier
-from src.services.strategy_service.ml.ml_utils import get_clean_Xy, get_X, get_y
+from src.strategies.ml.ml_utils import get_clean_Xy, get_X, get_y
 
 N_TRAIN = 400
 

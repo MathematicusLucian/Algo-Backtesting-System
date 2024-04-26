@@ -18,7 +18,7 @@ class StopLossFix(Strategy):
 class StopLoss_ATR(Strategy):
     n = 14
 
-    def ATR_Backtesting(phigh, plow, pclose, period):
+    def ATR_Backtesting(self, phigh, plow, pclose, period):
         high = pd.Series(phigh)
         low = pd.Series(plow)
         close = pd.Series(pclose)
@@ -29,7 +29,7 @@ class StopLoss_ATR(Strategy):
             timeperiod=period)
 
     def init(self):
-        self.atr = self.I(self.ATR_Backtesting, self.data.High,  self.data.Low, self.data.Close, self.n)
+        self.atr = self.I(self.ATR_Backtesting, self.data.High, self.data.Low, self.data.Close, self.n)
 
     def next(self): 
         if self.position:

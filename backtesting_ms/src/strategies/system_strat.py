@@ -1,6 +1,6 @@
 from backtesting import Strategy
 from backtesting.lib import resample_apply
-from src.services.strategy_service.multi_timeframes import RSI, SMA
+from src.strategies.multi_timeframes import RSI, SMA
 
 class System(Strategy):
     d_rsi = 30

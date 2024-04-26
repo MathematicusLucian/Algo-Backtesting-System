@@ -24,7 +24,7 @@ import talib as ta
 # load_dotenv(dotenv_path=os.path.join(BASE_DIR, ".env"))
 
 def add_indicators(data):
-    data["RSI"] = ta.RSI(data["Close"])
+    data["RSI"] = ta.rsi(data["Close"])
     data["EMA"] = ta.EMA(data["Close"])
     data["WMA"] = ta.WMA(data["Close"])
     data["ROC"] = ta.ROC(data["Close"])

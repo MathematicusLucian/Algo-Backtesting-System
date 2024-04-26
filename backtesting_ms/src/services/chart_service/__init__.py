@@ -1,1 +1,1 @@
-from charts import *
+from .charts import *

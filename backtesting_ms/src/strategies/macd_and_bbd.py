@@ -1,8 +1,8 @@
 from backtesting import Strategy
 from backtesting.lib import crossover
 import talib as ta
-from src.services.strategy_service.bollinger import BBANDS_2
-from src.services.strategy_service.macd import calculate_macd_2
+from src.strategies.bollinger import BBANDS_2
+from src.strategies.macd import calculate_macd_2
 
 class MACDandBBD(Strategy):
     MACD_short = 12 

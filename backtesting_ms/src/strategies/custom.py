@@ -28,7 +28,7 @@ class RsiOscillator(Strategy, SuperStrategy):
     def init(self):
         # param 1 --- function to calculate indicator values
         # param 2 --- pass data
-        self.rsi = self.I(ta.RSI, self.data.Close, self.rsi_window)
+        self.rsi = self.I(ta.rsi, self.data.Close, self.rsi_window)
         self.atr = self.I(ta.ATR, self.data.High , self.data.Low, self.data.Close, self.atr_window)
         self.setdata(self.data)
 

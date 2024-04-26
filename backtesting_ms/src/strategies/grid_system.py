@@ -9,7 +9,7 @@ import backtesting
 def generate_grid(midprice, grid_distance, grid_range):
     return (np.arange(midprice-grid_range, midprice+grid_range, grid_distance))
 
-class Strat(Strategy):
+class GridStrat(Strategy):
     mysize = 50
     def init(self):
         super().init()
@@ -48,7 +48,7 @@ def SIGNAL():
     return dfpl.signal
 dfpl['ATR'] = ta.atr(high = dfpl.High, low = dfpl.Low, close = dfpl.Close, length = 16)
 dfpl.dropna(inplace=True)
-bt = Backtest(dfpl, Strat, cash=50, margin=1/100, hedging=True, exclusive_orders=False)
+bt = Backtest(dfpl, GridStrat, cash=50, margin=1/100, hedging=True, exclusive_orders=False)
 stat = bt.run()
 backtesting.set_bokeh_output(notebook=False)
 bt.plot(show_legend=False, plot_width=None, plot_equity=True, plot_return=False, 

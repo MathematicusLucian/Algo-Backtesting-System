@@ -1,5 +1,5 @@
-from src.services.strategy_service.ml.ml import MLTrainOnceStrategy
-from src.services.strategy_service.ml.ml_utils import get_clean_Xy, get_X, get_y
+from src.strategies.ml.ml import MLTrainOnceStrategy
+from src.strategies.ml.ml_utils import get_clean_Xy, get_X, get_y
 
 N_TRAIN = 400
 

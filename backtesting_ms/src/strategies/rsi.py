@@ -57,7 +57,7 @@ class RsiOscillator(Strategy):
     atr_takeprofit=8
 
     def init(self):
-        self.rsi = self.I(ta.RSI, self.data.Close, self.rsi_window)
+        self.rsi = self.I(ta.rsi, self.data.Close, self.rsi_window)
         self.atr = self.I(ta.ATR, self.data.High , self.data.Low, self.data.Close, self.atr_window)
 
     def next(self): 

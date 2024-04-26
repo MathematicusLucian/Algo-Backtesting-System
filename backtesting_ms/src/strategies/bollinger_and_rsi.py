@@ -3,7 +3,7 @@ from backtesting.lib import crossover
 import talib as ta
 import pandas as pd
 import numpy as np
-from src.services.strategy_service.bollinger import BBANDS_2
+from src.strategies.bollinger import BBANDS_2
 
 def CalcATR(phigh, plow, pclose, period):
     high = pd.Series(phigh)

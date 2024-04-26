@@ -10,8 +10,7 @@ import yfinance as yfin
 yfin.pdr_override()
 plt.style.use('fivethirtyeight')
 from src.services.chart_service.charts import *
-from src.services.strategy_service import bollinger, ema, macd, rsi, sma
-from src.services.market_data_service.history import *
+from src.strategies import bollinger, ema, macd, rsi, sma
 
 stock_pairs_keys = ['BTC-GBP', 'ETH-GBP', 'SOL-GBP']
 signals = ['Buy_Signal_price', 'Sell_Signal_price']

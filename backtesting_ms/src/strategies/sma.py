@@ -22,6 +22,7 @@ class SmaCross(Strategy):
     n1 = 10
     # n2 = None
     n2 = 20
+    
     def init(self): #, n1=10, n2=20):
         Close1 = self.data.Close
         # print(self._params["n1"])
@@ -62,10 +63,8 @@ class SmaCross__Trailing(SignalStrategy, TrailingStrategy):
     
     def init(self):
         super().init()
-        
         sma1 = self.I(SMA, self.data.Close, self.n1)
         sma2 = self.I(SMA, self.data.Close, self.n2)
-        
         # sma1 crosses sma2 upwards -> diff gives us [-1,0, *1*]
         signal = (pd.Series(sma1) > sma2).astype(int).diff().fillna(0)
         signal = signal.replace(-1, 0)  # upwards/long only

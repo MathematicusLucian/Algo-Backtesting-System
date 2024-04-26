@@ -4,9 +4,9 @@ from backtesting import Backtest
 from backtesting.test import EURUSD, SMA
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
-from src.services.strategy_service.bollinger import bbands
-from src.services.strategy_service.ml.ml_utils import get_clean_Xy
-from src.services.strategy_service.ml.ml_train_once import MLTrainOnceStrategy
+from src.strategies.bollinger import bbands
+from src.strategies.ml.ml_utils import get_clean_Xy
+from src.strategies.ml.ml_train_once import MLTrainOnceStrategy
 
 def ml():
     data = EURUSD.copy()
