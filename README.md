@@ -1,5 +1,15 @@
 # Algo-Trading-System
 
+Work-in-progress: An algorithmic trading system consisting of 8 repos:
+- [algo_system_deployment](https://github.com/MathematicusLucian/algo_system_deployment)
+- [backtesting_ms](https://github.com/MathematicusLucian/backtesting_ms)
+- [stonk-value-forecasting-model](https://github.com/MathematicusLucian/stonk-value-forecasting-model)
+- [market_sentiment_ms](https://github.com/MathematicusLucian/market_sentiment_ms)
+- [market_data_ms](https://github.com/MathematicusLucian/market_data_ms)
+- [LiveCoinWatch](https://github.com/MathematicusLucian/LiveCoinWatch)
+- [algo-trader-ms](https://github.com/MathematicusLucian/algo-trader-ms)
+- [algo_trading_ui](https://github.com/MathematicusLucian/algo_trading_ui)
+
 ![Candlesticks chart](./assets/candlesticks.png)
 
 *Flask, SciKit, Backtesting.py, TA, TA-Lib, Angular, SQLite3, and Docker*:
