@@ -37,7 +37,9 @@ class DonchianBreakout(Strategy):
             if not self.position:
                 self.buy() 
         elif price < self.donchian_low[-2]:
-            self.position.close() # 売り
+            self.position.close()
+
+# class DonchianBreakout_WithSMACrossover(Strategy):
 
 class DonchianBreakout_WithShortPosition(Strategy):
     donchian_long = 20

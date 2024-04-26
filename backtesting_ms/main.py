@@ -64,6 +64,35 @@ trading_strategies = [
     # "Volatility_Breakout"
 ]
 
+strategy_results_colums = (
+    "_strategy",
+    "Start",
+    "End",
+    "Duration",
+    "Exposure Time [%]",
+    "Equity Final [$]",
+    "Equity Peak [$]",
+    "Return [%]",
+    "Buy & Hold Return [%]",
+    "Return (Ann.) [%]",
+    "Volatility (Ann.) [%]",
+    "Sharpe Ratio",
+    "Sortino Ratio",
+    "Calmar Ratio",
+    "Max. Drawdown [%]",
+    "Avg. Drawdown [%]",
+    "Max. Drawdown Duration",
+    "Avg. Drawdown Duration",
+    "Win Rate [%]",
+    "Best Trade [%]",
+    "Worst Trade [%]",
+    "Avg. Trade [%]",
+    "Max. Trade Duration",
+    "Avg. Trade Duration",
+    "Profit Factor",
+    "Expectancy [%]"
+)
+
 def optim_func(series):
     if series["Expectancy [%]"] < 0:
         return -1
@@ -85,19 +114,47 @@ def optim_func(series):
 
 # ml() #SciKit Machine Learning
 
-if __name__ == "__main__":
+def append_row(df, row):
+    return pd.concat([
+                df, 
+                pd.DataFrame([row], columns=row.index)]
+           ).reset_index(drop=True)
+
+def determine_optimized_strategy_config(bt):
+    return bt.optimize(n1=range(5, 30, 5),
+        n2=range(10, 70, 5),
+        maximize="Win Rate [%]", #"Equity Final [$]", #"Profit Factor"
+        constraint=lambda param: param.n1 < param.n2)
+
+def get_strategy_with_max_result(maximize):
     trading_strategy_factory = TradingStrategy_ConcreteCreator()
+    maximum_result=0
     for strat in trading_strategies:
         trading_strategy: type[Strategy] = trading_strategy_factory.get_trading_stategy(strat)
-        asset="BTC-GBP"
-        start=date(2014,1,1) 
-        end=date.today()
-        bitcoin_df: pd.DataFrame = pdr.get_data_yahoo(asset, start=start, end=end) 
-        bitcoin_df["Date"]= pd.to_datetime(bitcoin_df.index) 
         bt = Backtest(bitcoin_df, trading_strategy, cash=10_000, commission=.002)
         stats = bt.run() # kwargs: set parameters
-        # stats = bt.optimize(n1=range(5, 30, 5),
-        #                     n2=range(10, 70, 5),
-        #                     maximize="Win Rate [%]", #"Equity Final [$]", #"Profit Factor"
-        #                     constraint=lambda param: param.n1 < param.n2)
-        bt.plot(plot_volume=False, plot_pl=False)
+        if float(stats[maximize]) > float(maximum_result):
+            maximum_result = float(stats[maximize])
+        # stats = determine_optimized_strategy_config(bt)
+        return stats, bt
+
+if __name__ == "__main__":
+    asset="BTC-GBP"
+    start=date(2014,1,1) 
+    end=date.today()
+    bitcoin_df:pd.DataFrame = pdr.get_data_yahoo(asset, start=start, end=end) 
+    bitcoin_df["Date"] = pd.to_datetime(bitcoin_df.index) 
+    maximize="Win Rate [%]"
+
+    stats, bt = get_strategy_with_max_result(maximize)
+
+    strategy_with_maximum_result = stats["_strategy"]
+    strategy_results_df = pd.DataFrame(columns=strategy_results_colums)
+    strategy_results_df = append_row(strategy_results_df, stats).reindex(columns=strategy_results_colums)
+    strategy_results_df.to_csv('strategy_results_df.csv', sep=',', index=False, encoding='utf-8')
+    equity_curve = stats["_equity_curve"]
+    equity_curve.to_csv('strategy_results_df__equity_curve.csv', sep=',', index=False, encoding='utf-8')
+    trades = stats["_trades"]
+    trades.to_csv('strategy_results_df__trades', sep=',', index=False, encoding='utf-8')
+
+    # bt.plot(plot_volume=False, plot_pl=False)
